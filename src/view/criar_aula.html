@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Detalhe do Curso • ComCourse</title>
+    <title>ComCourse</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -19,33 +19,19 @@
   <body>
     <header data-bs-theme="dark">
       <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-        <div
-          class="container-fluid d-flex justify-content-between align-items-center"
-        >
-          <!-- Logo + Menu -->
+        <div class="container-fluid d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center gap-3">
-            <a href="index.html"
-              ><img src="./img/logoCo.png" alt="Logo Coruja" class="logo"
-            /></a>
+            <a href="index.html"><img src="./img/logoCo.png" alt="Logo Coruja" class="logo" /></a>
           </div>
-
-          <!-- Formulário de busca -->
           <form id="form-search" role="search">
             <input type="search" id="search-input" placeholder="Buscar cursos..." />
           </form>
-          
-         <div id="overlay" class="overlay-busca">
-            <div id="overlay-content-busca" class="overlay-content">
-             
-            </div>
-          </div>
-
-          <!-- Botões à direita -->
+          <div id="overlay" class="overlay-busca"><div id="overlay-content-busca" class="overlay-content"></div></div>
           <div class="topbar-right d-flex align-items-center gap-3">
             <a class="btn-cursos" href="index.html#cursos">Cursos</a>
             <a href="SobreNos.html" class="user">Sobre Nós</a>
-            <div class="perfil-bolinha">
-              <i class="fas fa-user"></i>
+            <div class="perfil-bolinha" style="cursor: pointer;">
+              <!-- Aqui o JS insere dinamicamente a imagem ou o ícone -->
             </div>
           </div>
         </div>
@@ -117,7 +103,7 @@
     </div>
 
     <script src="./js/overlay.js"></script>
-    <script src="./js/criar_aula.js"></script>
+    <script src="./js/criar_aular.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

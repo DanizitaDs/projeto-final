@@ -8,10 +8,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // Elements
   const profileForm = document.getElementById("profile-form");
-  const profileAvatar = document.getElementById("profile-avatar");
   const fileInput = document.getElementById("profileImage");
+  const avatarContainer = document.getElementById("avatar-container");
   const editButton = document.getElementById("editProfile");
   const saveButton = document.getElementById("saveProfile");
   const cancelButton = document.getElementById("cancelEdit");
@@ -19,7 +18,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const progressBar = document.getElementById("uploadProgress");
   const progressFill = document.querySelector(".progress-fill");
 
-  // User data fields
   let userData = {
     name: "",
     email: "",
@@ -27,47 +25,55 @@ document.addEventListener("DOMContentLoaded", async () => {
     profileUrl: "",
   };
 
-  // Load user data
+  function renderProfileImage(url) {
+    avatarContainer.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = "Foto de perfil";
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.objectFit = "cover";
+    img.classList.add("foto-perfil");
+    avatarContainer.appendChild(img);
+  }
+
   try {
     const response = await fetch(`http://localhost:3000/users/${userId}`);
     if (!response.ok) throw new Error("Erro ao buscar usuário");
 
     userData = await response.json();
 
-    // Update display elements immediately
-    document.getElementById("user-name-display").textContent =
-      userData.name || "Usuário";
-    document.getElementById("user-email-display").textContent =
-      userData.email || "email@exemplo.com";
+     // Update display elements immediately
+     document.getElementById("user-name-display").textContent =
+     userData.name || "Usuário";
+   document.getElementById("user-email-display").textContent =
+     userData.email || "email@exemplo.com";
 
-    // Set form values
-    document.getElementById("name").value = userData.name || "";
-    document.getElementById("email").value = userData.email || "";
+     document.getElementById("name").value = userData.name || "";
+     document.getElementById("email").value = userData.email || "";
 
-    // Set profile image
     if (userData.profileUrl) {
-      profileAvatar.src = userData.profileUrl.startsWith("http")
+      const fullUrl = userData.profileUrl.startsWith("http")
         ? userData.profileUrl
         : `http://localhost:3000${userData.profileUrl}`;
+      renderProfileImage(fullUrl);
     }
   } catch (error) {
     console.error("Erro ao carregar dados do usuário:", error);
     showNotification("Erro ao carregar perfil do usuário.", "error");
   }
 
-  // Preview image when selected
   fileInput.addEventListener("change", () => {
     const file = fileInput.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        profileAvatar.src = e.target.result;
+        renderProfileImage(e.target.result);
       };
       reader.readAsDataURL(file);
     }
   });
 
-  // Toggle edit mode
   editButton.addEventListener("click", () => {
     editFields.forEach((field) => (field.style.display = "block"));
     editButton.style.display = "none";
@@ -75,36 +81,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     cancelButton.style.display = "block";
   });
 
-  // Cancel edit
   cancelButton.addEventListener("click", () => {
     editFields.forEach((field) => (field.style.display = "none"));
     editButton.style.display = "block";
     saveButton.style.display = "none";
     cancelButton.style.display = "none";
 
-    // Reset form values and image
     document.getElementById("name").value = userData.name || "";
     document.getElementById("email").value = userData.email || "";
     document.getElementById("password").value = "";
 
     if (userData.profileUrl) {
-      profileAvatar.src = userData.profileUrl.startsWith("http")
+      const fullUrl = userData.profileUrl.startsWith("http")
         ? userData.profileUrl
         : `http://localhost:3000${userData.profileUrl}`;
+      renderProfileImage(fullUrl);
     } else {
-      profileAvatar.src = "https://via.placeholder.com/150";
+      avatarContainer.innerHTML = "<i class='fas fa-user fa-3x text-white'></i>";
     }
 
-    // Clear file input
     fileInput.value = "";
   });
 
-  // Handle form submission
   profileForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     try {
-      // Show progress
       progressBar.style.display = "block";
       progressFill.style.width = "0%";
 
@@ -122,28 +124,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         formData.append("password", userData.password);
       }
 
-      // Add profile image if selected
       const file = fileInput.files[0];
       if (file) {
         formData.append("profileImage", file);
       }
 
-      // Simulate upload progress
-      let progress = 0;
-      const progressInterval = setInterval(() => {
-        progress += 10;
-        if (progress <= 90) {
-          progressFill.style.width = `${progress}%`;
-        }
-      }, 200);
+       // Simulate upload progress
+       let progress = 0;
+       const progressInterval = setInterval(() => {
+         progress += 10;
+         if (progress <= 90) {
+           progressFill.style.width = `${progress}%`;
+         }
+       }, 200);
 
-      // Send request
       const response = await fetch(`http://localhost:3000/users/${userId}`, {
         method: "PUT",
         body: formData,
-        // Don't set Content-Type header, the browser sets it with boundary for FormData
       });
-
       clearInterval(progressInterval);
       progressFill.style.width = "100%";
 

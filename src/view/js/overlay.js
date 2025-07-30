@@ -152,4 +152,3 @@ function fecharResultado(btn) {
     card.remove();
   }
 }
-
