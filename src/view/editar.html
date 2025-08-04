@@ -116,7 +116,7 @@
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-content">
-        <i class="fab fa-instagram"></i>
+        <a class="fab fa-instagram" href="https://www.instagram.com/communitycourse/" target="_blank"></a>
       </div>
     </footer>
 
@@ -126,7 +126,7 @@
         <div class="overlay-button-menu"><a href="editar.html" class="text-decoration-none text-white"><i class="fas fa-edit"></i> Editar Cursos/Aulas</a></div>
         <div class="overlay-button-menu"><a href="criar_cursos.html" class="text-decoration-none text-white"><i class="fa fa-plus"></i>Criar Cursos</a></div>
         <div class="overlay-button-menu"><a href="criar_aula.html" class="text-decoration-none text-white"><i class="fa fa-plus"></i> Criar Aulas</a></div>
-        <div class="overlay-button-menu"><a href="https://wa.me/5551999495754" class="text-decoration-none text-white"><i class="fas fa-headphones"></i> Suporte </a></div>
+        <div class="overlay-button-menu"><a href="https://mailto:comcoursetds@gmail.com" target="_blank" class="text-decoration-none text-white"><i class="fas fa-headphones"></i> Suporte </a></div>
         <div class="overlay-button-menu text-white" onclick="excluirConta()"><i class="fas fa-cog"></i> Excluir Conta</div>
         <div id="red-menu" class="overlay-button text-red" onclick="sair()"><i class="fa fa-sign-out" ></i> Sair</div>
       </div>
@@ -138,6 +138,28 @@
         <button class="sair" onclick="sair()">Sair</button>
       </div>
     </div>
+<!-- Container de alertas -->
+<div id="alert-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1055;"></div>
+
+<!-- Modal de confirmação -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title" id="confirmModalLabel">Confirmação</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body" id="confirmModalMessage">
+        <!-- Mensagem de confirmação -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmModalYes">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
     <script src="./js/overlay.js"></script>
     <script src="./js/editar.js"></script>

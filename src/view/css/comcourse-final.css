@@ -303,8 +303,11 @@ body {
   align-items: center;
 }
 
-.footer i {
+.footer a {
   font-size: 30px;
+  margin-left: 20px;
+  text-decoration: none;
+  color: #000000;
 }
 
 .titulo h1 {
@@ -944,11 +947,12 @@ h4 {
 }
 
 .form-container-curso,
-.form-container-aula {
+.form-container-aula,
+.form-container-aula-criar {
   max-width: 600px;
   margin: 40px auto;
   padding: 30px;
-  margin-top: 6%;
+  margin-top: 8%;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -1049,13 +1053,28 @@ h4 {
     height: 100px;
   }
 
+  .form-container-curso{
+    margin-top: 240px;
+    margin-bottom: 100px;
+  }
+
+  .form-container-aula-criar{
+    margin-top: 240px;
+    margin-bottom: 50px; 
+  }
+
+  .form-container-aula{
+    margin-top: 50px;
+    margin-bottom: 100px;
+  }
+
   .contact-info {
     gap: 8px;
   }
 
   .profile-card {
     margin-top: 300px;
-    margin-bottom: 250px;
+    margin-bottom: 240px;
 }
 
   .contact-item {
@@ -2327,6 +2346,9 @@ textarea {
   #meio {
     margin-top: 20%;
   }
+  .titulo{
+    margin-top: 140px;
+  }
 
   #search-results .card {
     margin-top: 200px;
@@ -2359,21 +2381,36 @@ textarea {
 @media (min-width: 768px) {
   #search-results .card {
     margin-left: 100px;
-    margin-top: 20px;
+    margin-top: 50px;
   }
   #meio {
     top: 40px;
   }
 }
+
+@media(max-width:640px){
+  .titulo{
+    margin-top: 240px;
+  }
+}
+
 @media (max-width: 576px) {
   .footer {
     flex-direction: column;
     padding: 15px;
   }
 
-  .footer i {
+  .footer a {
     font-size: 24px;
     margin-bottom: 10px;
+  }
+
+.titulo{
+  margin-top: 140px;
+}
+
+  .footer-content{
+    width: 430px;
   }
 }
 .avatar-container {

@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const userId = localStorage.getItem("userId");
   if (!userId) {
-    showNotification("Usuário não está logado.", "error");
+    alertShow("Usuário não está logado.", "error");
     setTimeout(() => {
       window.location.href = "cadastro_login.html";
     }, 2000);
@@ -43,14 +43,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     userData = await response.json();
 
-     // Update display elements immediately
-     document.getElementById("user-name-display").textContent =
-     userData.name || "Usuário";
-   document.getElementById("user-email-display").textContent =
-     userData.email || "email@exemplo.com";
-
-     document.getElementById("name").value = userData.name || "";
-     document.getElementById("email").value = userData.email || "";
+    document.getElementById("user-name-display").textContent = userData.name || "Usuário";
+    document.getElementById("user-email-display").textContent = userData.email || "email@exemplo.com";
+    document.getElementById("name").value = userData.name || "";
+    document.getElementById("email").value = userData.email || "";
 
     if (userData.profileUrl) {
       const fullUrl = userData.profileUrl.startsWith("http")
@@ -60,16 +56,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   } catch (error) {
     console.error("Erro ao carregar dados do usuário:", error);
-    showNotification("Erro ao carregar perfil do usuário.", "error");
+    alertShow("Erro ao carregar perfil do usuário.", "error");
   }
 
   fileInput.addEventListener("change", () => {
     const file = fileInput.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        renderProfileImage(e.target.result);
-      };
+      reader.onload = (e) => renderProfileImage(e.target.result);
       reader.readAsDataURL(file);
     }
   });
@@ -110,17 +104,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       progressBar.style.display = "block";
       progressFill.style.width = "0%";
 
-      // Create FormData
       const formData = new FormData();
       formData.append("name", document.getElementById("name").value);
       formData.append("email", document.getElementById("email").value);
 
-      // Only append password if it's not empty
       const password = document.getElementById("password").value;
       if (password) {
         formData.append("password", password);
       } else {
-        // If password is not provided, use existing password
         formData.append("password", userData.password);
       }
 
@@ -129,19 +120,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         formData.append("profileImage", file);
       }
 
-       // Simulate upload progress
-       let progress = 0;
-       const progressInterval = setInterval(() => {
-         progress += 10;
-         if (progress <= 90) {
-           progressFill.style.width = `${progress}%`;
-         }
-       }, 200);
+      let progress = 0;
+      const progressInterval = setInterval(() => {
+        progress += 10;
+        if (progress <= 90) {
+          progressFill.style.width = `${progress}%`;
+        }
+      }, 200);
 
       const response = await fetch(`http://localhost:3000/users/${userId}`, {
         method: "PUT",
         body: formData,
       });
+
       clearInterval(progressInterval);
       progressFill.style.width = "100%";
 
@@ -150,91 +141,117 @@ document.addEventListener("DOMContentLoaded", async () => {
         throw new Error(errorData.message || "Erro ao atualizar perfil");
       }
 
-      // Update user data with response
       const updatedUser = await response.json();
       userData = updatedUser;
       localStorage.setItem("profileUrl", userData.profileUrl);
 
-      // Update display
       document.getElementById("user-name-display").textContent = userData.name;
-      document.getElementById("user-email-display").textContent =
-        userData.email;
+      document.getElementById("user-email-display").textContent = userData.email;
 
-      // Exit edit mode
       editFields.forEach((field) => (field.style.display = "none"));
       editButton.style.display = "block";
       saveButton.style.display = "none";
       cancelButton.style.display = "none";
 
-      showNotification("Perfil atualizado com sucesso!", "success");
+      alertShow("Perfil atualizado com sucesso!", "success");
 
-      // Hide progress after 1 second
       setTimeout(() => {
         progressBar.style.display = "none";
+        window.location.reload();
       }, 1000);
-      window.location.reload();
     } catch (error) {
       console.error("Erro ao atualizar perfil:", error);
-      showNotification(error.message || "Erro ao atualizar perfil.", "error");
+      alertShow(error.message || "Erro ao atualizar perfil.", "error");
       progressBar.style.display = "none";
     }
   });
 
-  // Account deletion
-  document
-    .getElementById("btn-excluir")
-    ?.addEventListener("click", async () => {
-      if (
-        confirm(
-          "Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita."
-        )
-      ) {
-        try {
-          const response = await fetch(
-            `http://localhost:3000/users/${userId}`,
-            {
-              method: "DELETE",
-            }
-          );
+  // Excluir conta
+  document.getElementById("btn-excluir")?.addEventListener("click", async () => {
+    const confirmed = await showConfirm("Tem certeza que deseja excluir sua conta?");
+    if (!confirmed) return;
 
-          if (!response.ok) {
-            throw new Error("Erro ao excluir conta");
-          }
+    try {
+      const response = await fetch(`http://localhost:3000/users/${userId}`, {
+        method: "DELETE",
+      });
 
-          showNotification("Conta excluída com sucesso!", "success");
+      if (!response.ok) throw new Error("Erro ao excluir conta");
 
-          setTimeout(() => {
-            localStorage.removeItem("userId");
-            window.location.href = "cadastro_login.html";
-          }, 2000);
-        } catch (error) {
-          console.error("Erro ao excluir conta:", error);
-          showNotification("Erro ao excluir conta.", "error");
-        }
-      }
-    });
+      alertShow("Conta excluída com sucesso!", "success");
 
-  // Logout
-  document.getElementById("btn-sair")?.addEventListener("click", () => {
-    if (confirm("Tem certeza que deseja sair?")) {
-      localStorage.removeItem("userId");
-      window.location.href = "cadastro_login.html";
+      setTimeout(() => {
+        localStorage.removeItem("userId");
+        window.location.href = "cadastro_login.html";
+      }, 2000);
+    } catch (error) {
+      console.error("Erro ao excluir conta:", error);
+      alertShow("Erro ao excluir conta.", "error");
     }
   });
 
-  // Helper function for notifications
-  function showNotification(message, type) {
-    const notification = document.getElementById("notification");
-    const notificationText = document.querySelector(".notification-text");
+  // Logout
+  document.getElementById("btn-sair")?.addEventListener("click", async () => {
+    const confirmed = await showConfirm("Tem certeza que deseja sair?");
+    if (!confirmed) return;
 
-    notification.style.display = "block";
-    notification.className = `alert ${
-      type === "error" ? "alert-danger" : "alert-success"
-    } mt-3`;
-    notificationText.textContent = message;
+    localStorage.removeItem("userId");
+    window.location.href = "cadastro_login.html";
+  });
 
+  // Função de alerta visual
+  function alertShow(message, type = "success") {
+    const alertContainer = document.getElementById("alert-container");
+    const alert = document.createElement("div");
+    alert.className = `alert alert-${type === "error" ? "danger" : "success"} alert-dismissible fade show`;
+    alert.role = "alert";
+    alert.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    alertContainer.appendChild(alert);
     setTimeout(() => {
-      notification.style.display = "none";
-    }, 5000);
+      alert.remove();
+    }, 4000);
+  }
+
+  // Função de confirmação visual com Promise
+  function showConfirm(message) {
+    return new Promise((resolve) => {
+      const confirmModal = document.createElement("div");
+      confirmModal.className = "modal fade";
+      confirmModal.tabIndex = -1;
+      confirmModal.innerHTML = `
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Confirmação</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <p>${message}</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="button" class="btn btn-danger" id="confirm-yes">Confirmar</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(confirmModal);
+
+      const modal = new bootstrap.Modal(confirmModal);
+      modal.show();
+
+      confirmModal.querySelector("#confirm-yes").addEventListener("click", () => {
+        modal.hide();
+        resolve(true);
+      });
+
+      confirmModal.addEventListener("hidden.bs.modal", () => {
+        confirmModal.remove();
+        resolve(false);
+      });
+    });
   }
 });

@@ -7,7 +7,7 @@ const cursoSelect = document.getElementById("curso-select");
         const cursos = await response.json();
 
         if (cursos.length === 0) {
-          alert("Nenhum curso cadastrado. Crie um curso antes de adicionar aulas.");
+          showAlert("Nenhum curso cadastrado. Crie um curso antes de adicionar aulas.");
           window.location.href = "CriarCurso.html";
           return;
         }
@@ -23,6 +23,28 @@ const cursoSelect = document.getElementById("curso-select");
       }
     }
 
+    // Alerta visual com Bootstrap
+function showAlert(message, type = "success", timeout = 3000) {
+  const alertContainer = document.getElementById("alert-container");
+  if (!alertContainer) return;
+
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = `
+    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+  `;
+
+  const alertElement = wrapper.firstElementChild;
+  alertContainer.appendChild(alertElement);
+
+  setTimeout(() => {
+    const alertInstance = bootstrap.Alert.getOrCreateInstance(alertElement);
+    alertInstance.close();
+  }, timeout);
+}
+
     btnCriarAula.addEventListener("click", async () => {
       const cursoId = cursoSelect.value;
       const titulo = document.getElementById("aula-titulo").value.trim();
@@ -30,7 +52,7 @@ const cursoSelect = document.getElementById("curso-select");
       const url = document.getElementById("aula-url").value.trim();
 
       if (!cursoId || !titulo || !descricao || !url) {
-        alert("Preencha todos os campos.");
+        showAlert("Preencha todos os campos.");
         return;
       }
 
@@ -48,10 +70,10 @@ const cursoSelect = document.getElementById("curso-select");
 
         if (!response.ok) throw new Error("Erro ao criar aula");
 
-        alert("Aula criada com sucesso!");
+        showAlert("Aula criada com sucesso!");
         window.location.reload();
       } catch (error) {
-        alert("Erro ao criar a aula.");
+        showAlert("Erro ao criar a aula.");
         console.error(error);
       }
     });

@@ -1,7 +1,8 @@
 const overlayMenu = document.getElementById("overlay-menu");
-const overlayBusca = document.getElementById("overlay"); // corrigido aqui!
+const overlayBusca = document.getElementById("overlay");
 const configModal = document.getElementById("config-modal");
 
+// === Configura imagem de perfil ===
 document.addEventListener("DOMContentLoaded", function () {
   const profileBolinhaElement = document.querySelector(".perfil-bolinha");
 
@@ -36,14 +37,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-// Abrir overlay do menu
+// === Abrir overlay do menu ===
 document.querySelector(".perfil-bolinha").addEventListener("click", () => {
   overlayMenu.classList.add("show");
 });
 
-// Fechar overlays ao clicar fora
+// === Fechar overlays ao clicar fora ===
 document.addEventListener("click", (e) => {
-  // Fechar o menu
   const contentMenu = document.getElementById("overlay-content-menu");
   if (
     overlayMenu &&
@@ -54,7 +54,6 @@ document.addEventListener("click", (e) => {
     overlayMenu.classList.remove("show");
   }
 
-  // Fechar a busca
   const contentBusca = document.getElementById("overlay-content-busca");
   if (
     overlayBusca &&
@@ -66,30 +65,55 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Fechar overlay do menu ao clicar em links
+// === Fechar menu ao clicar em links ===
 document.querySelectorAll("#overlay-menu a").forEach((link) => {
   link.addEventListener("click", () => {
     overlayMenu.classList.remove("show");
   });
 });
 
-// Função para excluir conta
+// === Excluir conta com confirmação ===
 function excluirConta() {
-  if (confirm("Tem certeza que deseja excluir sua conta?")) {
-    alert("Conta excluída!");
-    window.location.href = "cadastro_login.html";
-  }
+  showConfirm("Tem certeza que deseja excluir sua conta?", async () => {
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) {
+      showAlert("Usuário não encontrado.", "danger");
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/users/${userId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao excluir conta.");
+      }
+
+      showAlert("Conta excluída com sucesso!", "success");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("profileUrl");
+
+      setTimeout(() => {
+        window.location.href = "cadastro_login.html";
+      }, 2000);
+    } catch (error) {
+      console.error("Erro ao excluir conta:", error);
+      showAlert("Erro ao excluir conta. Tente novamente mais tarde.", "danger");
+    }
+  });
 }
 
-// Função para sair
+// === Sair com confirmação ===
 function sair() {
-  if (confirm("Tem certeza que deseja sair da sua conta?")) {
+  showConfirm("Tem certeza que deseja sair da sua conta?", () => {
     localStorage.removeItem("userId");
     window.location.href = "cadastro_login.html";
-  }
+  });
 }
 
-// === 🔍 Lógica de Busca ===
+// === Busca de cursos ===
 document.getElementById("form-search").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -97,13 +121,15 @@ document.getElementById("form-search").addEventListener("submit", async (e) => {
   const resultsContainer = document.getElementById("search-results");
 
   if (!searchTerm) {
-    resultsContainer.innerHTML = "<p>Digite algo para buscar.</p>";
+    showAlert("Digite algo para buscar.", "warning");
     if (overlayBusca) overlayBusca.classList.add("show");
     return;
   }
 
   try {
-    const response = await fetch(`http://localhost:3000/cursos?search=${encodeURIComponent(searchTerm)}`);
+    const response = await fetch(
+      `http://localhost:3000/cursos?search=${encodeURIComponent(searchTerm)}`
+    );
 
     if (!response.ok) {
       throw new Error("Erro na resposta do servidor");
@@ -115,7 +141,8 @@ document.getElementById("form-search").addEventListener("submit", async (e) => {
       resultsContainer.innerHTML = "<p>Nenhum curso encontrado.</p>";
     } else {
       resultsContainer.innerHTML = cursos
-      .map((curso) => `
+        .map(
+          (curso) => `
         <div class="card mb-3 position-relative" style="max-width: 540px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
           <button class="btn-close position-absolute end-0 top-0 m-2" onclick="fecharResultado(this)"></button>
           <div class="row g-0 align-items-center">
@@ -127,28 +154,67 @@ document.getElementById("form-search").addEventListener("submit", async (e) => {
                 <h5 class="card-title mb-1">${curso.title}</h5>
                 <p class="card-text small text-muted">${curso.description}</p>
                 <a href="CriarCurso.html?id=${curso.id}" class="btn btn-outline-primary btn-sm mb-2">Ver Curso</a>
-                </div>
               </div>
             </div>
           </div>
         </div>
-      `)
-      .join("");
-    
+      `
+        )
+        .join("");
     }
 
     if (overlayBusca) overlayBusca.classList.add("show");
-
   } catch (err) {
     console.error("Erro ao buscar cursos:", err);
-    resultsContainer.innerHTML = "<p>Erro ao buscar cursos.</p>";
+    showAlert("Erro ao buscar cursos. Tente novamente mais tarde.", "danger");
     if (overlayBusca) overlayBusca.classList.add("show");
   }
-
 });
+
+// === Fechar resultado individual da busca ===
 function fecharResultado(btn) {
-  const card = btn.closest('.card');
+  const card = btn.closest(".card");
   if (card) {
     card.remove();
   }
+}
+
+// === Alerta bonito com Bootstrap ===
+function showAlert(message, type = "success", timeout = 3000) {
+  const alertContainer = document.getElementById("alert-container");
+
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = `
+    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+  `;
+
+  const alertElement = wrapper.firstElementChild;
+  alertContainer.appendChild(alertElement);
+
+  setTimeout(() => {
+    const alertInstance = bootstrap.Alert.getOrCreateInstance(alertElement);
+    alertInstance.close();
+  }, timeout);
+}
+
+// === Confirmação bonita com modal Bootstrap ===
+function showConfirm(message, onConfirm) {
+  const confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
+  const confirmMessage = document.getElementById("confirmModalMessage");
+  const confirmYesBtn = document.getElementById("confirmModalYes");
+
+  confirmMessage.textContent = message;
+
+  const newButton = confirmYesBtn.cloneNode(true);
+  confirmYesBtn.parentNode.replaceChild(newButton, confirmYesBtn);
+
+  newButton.addEventListener("click", () => {
+    confirmModal.hide();
+    onConfirm();
+  });
+
+  confirmModal.show();
 }

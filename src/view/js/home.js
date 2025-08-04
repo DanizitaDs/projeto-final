@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const userId = localStorage.getItem("userId");
   if (!userId) {
-    alert("Você precisa estar logado para acessar esta página.");
+    showAlert("Você precisa estar logado para acessar esta página.");
     window.location.href = "cadastro_login.html";
     return;
   }
@@ -84,4 +84,24 @@ async function loadCourses() {
   } catch (error) {
     console.error("Erro ao carregar cursos:", error);
   }
+}
+// Alerta visual com Bootstrap
+function showAlert(message, type = "success", timeout = 3000) {
+  const alertContainer = document.getElementById("alert-container");
+  if (!alertContainer) return;
+
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = `
+    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+  `;
+  const alertElement = wrapper.firstElementChild;
+  alertContainer.appendChild(alertElement);
+
+  setTimeout(() => {
+    const alertInstance = bootstrap.Alert.getOrCreateInstance(alertElement);
+    alertInstance.close();
+  }, timeout);
 }

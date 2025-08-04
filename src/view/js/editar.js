@@ -13,20 +13,16 @@ const inputAulaDescricao = document.getElementById("aula-descricao");
 const inputAulaUrl = document.getElementById("aula-url");
 const btnExcluirAula = document.getElementById("btn-excluir-aula");
 
-// Inicial: desabilita formulários
+// === Início: estado inicial ===
 desabilitarFormularioCurso();
 desabilitarFormularioAula();
 
-// Funções para habilitar/desabilitar formulários
+// === Funções utilitárias ===
 function desabilitarFormularioCurso() {
-  formCurso
-    .querySelectorAll("input, textarea, button")
-    .forEach((el) => (el.disabled = true));
+  formCurso.querySelectorAll("input, textarea, button").forEach(el => el.disabled = true);
 }
 function habilitarFormularioCurso() {
-  formCurso
-    .querySelectorAll("input, textarea, button")
-    .forEach((el) => (el.disabled = false));
+  formCurso.querySelectorAll("input, textarea, button").forEach(el => el.disabled = false);
 }
 function limparFormularioCurso() {
   inputCursoTitulo.value = "";
@@ -35,14 +31,10 @@ function limparFormularioCurso() {
 }
 
 function desabilitarFormularioAula() {
-  formAula
-    .querySelectorAll("input, textarea, button")
-    .forEach((el) => (el.disabled = true));
+  formAula.querySelectorAll("input, textarea, button").forEach(el => el.disabled = true);
 }
 function habilitarFormularioAula() {
-  formAula
-    .querySelectorAll("input, textarea, button")
-    .forEach((el) => (el.disabled = false));
+  formAula.querySelectorAll("input, textarea, button").forEach(el => el.disabled = false);
 }
 function limparFormularioAula() {
   inputAulaTitulo.value = "";
@@ -50,28 +42,73 @@ function limparFormularioAula() {
   inputAulaUrl.value = "";
 }
 
-// Carregar cursos para o select
+// Alerta visual com Bootstrap
+function showAlert(message, type = "success", timeout = 3000) {
+  const alertContainer = document.getElementById("alert-container");
+  if (!alertContainer) return;
+
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = `
+    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+  `;
+  const alertElement = wrapper.firstElementChild;
+  alertContainer.appendChild(alertElement);
+
+  setTimeout(() => {
+    const alertInstance = bootstrap.Alert.getOrCreateInstance(alertElement);
+    alertInstance.close();
+  }, timeout);
+}
+
+// Modal de confirmação com promise
+function showConfirm(message) {
+  return new Promise(resolve => {
+    const modalElement = document.getElementById("confirmModal");
+    const modal = new bootstrap.Modal(modalElement);
+    const modalMessage = document.getElementById("confirmModalMessage");
+    const confirmBtn = document.getElementById("confirmModalYes");
+
+    modalMessage.textContent = message;
+
+    const newButton = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newButton, confirmBtn);
+
+    newButton.addEventListener("click", () => {
+      resolve(true);
+      modal.hide();
+    });
+
+    modalElement.addEventListener("hidden.bs.modal", () => {
+      resolve(false);
+    }, { once: true });
+
+    modal.show();
+  });
+}
+
+// === Carregar cursos no select ===
 async function carregarCursos() {
   try {
     const res = await fetch("http://localhost:3000/cursos");
     const cursos = await res.json();
 
-    // Limpa options antes de inserir
-    selectCurso.innerHTML =
-      '<option value="">-- Selecione um curso --</option>';
-    cursos.forEach((curso) => {
+    selectCurso.innerHTML = '<option value="">-- Selecione um curso --</option>';
+    cursos.forEach(curso => {
       const option = document.createElement("option");
       option.value = curso.id;
       option.textContent = curso.title;
       selectCurso.appendChild(option);
     });
   } catch (error) {
-    alert("Erro ao carregar cursos");
+    showAlert("Erro ao carregar cursos", "danger");
     console.error(error);
   }
 }
 
-// Ao mudar curso
+// === Quando muda o curso selecionado ===
 selectCurso.addEventListener("change", async () => {
   const cursoId = selectCurso.value;
   if (!cursoId) {
@@ -83,9 +120,9 @@ selectCurso.addEventListener("change", async () => {
     selectAula.disabled = true;
     return;
   }
+
   habilitarFormularioCurso();
   try {
-    // Busca curso pelo ID
     const res = await fetch(`http://localhost:3000/cursos/${cursoId}`);
     if (!res.ok) throw new Error("Curso não encontrado");
     const curso = await res.json();
@@ -94,12 +131,11 @@ selectCurso.addEventListener("change", async () => {
     inputCursoDescricao.value = curso.description || "";
     inputCursoImagem.value = curso.imageUrl || "";
 
-    // Carrega aulas do curso no select (usando "classes")
-    if (curso.classes && curso.classes.length) {
+    // Carregar aulas
+    if (curso.classes && curso.classes.length > 0) {
       selectAula.disabled = false;
-      selectAula.innerHTML =
-        '<option value="">-- Selecione uma aula --</option>';
-      curso.classes.forEach((aula) => {
+      selectAula.innerHTML = '<option value="">-- Selecione uma aula --</option>';
+      curso.classes.forEach(aula => {
         const option = document.createElement("option");
         option.value = aula.id;
         option.textContent = aula.title;
@@ -107,19 +143,18 @@ selectCurso.addEventListener("change", async () => {
       });
     } else {
       selectAula.disabled = true;
-      selectAula.innerHTML =
-        '<option value="">-- Nenhuma aula cadastrada --</option>';
+      selectAula.innerHTML = '<option value="">-- Nenhuma aula cadastrada --</option>';
     }
 
     limparFormularioAula();
     desabilitarFormularioAula();
   } catch (error) {
-    alert("Erro ao carregar curso");
+    showAlert("Erro ao carregar curso", "danger");
     console.error(error);
   }
 });
 
-// Ao mudar aula
+// === Quando muda a aula selecionada ===
 selectAula.addEventListener("change", async () => {
   const aulaId = selectAula.value;
   if (!aulaId) {
@@ -127,140 +162,140 @@ selectAula.addEventListener("change", async () => {
     desabilitarFormularioAula();
     return;
   }
+
   habilitarFormularioAula();
   try {
-    // Busca aula pelo ID
     const res = await fetch(`http://localhost:3000/aulas/${aulaId}`);
     if (!res.ok) throw new Error("Aula não encontrada");
     const aula = await res.json();
 
     inputAulaTitulo.value = aula.title || "";
     inputAulaDescricao.value = aula.description || "";
-    inputAulaUrl.value = aula.url || aula.videoUrl || ""; // tenta os dois nomes possíveis
+    inputAulaUrl.value = aula.url || aula.videoUrl || "";
   } catch (error) {
-    alert("Erro ao carregar aula");
+    showAlert("Erro ao carregar aula", "danger");
     console.error(error);
   }
 });
 
-// Salvar curso
+// === Atualizar curso ===
 formCurso.addEventListener("submit", async (e) => {
   e.preventDefault();
   const cursoId = selectCurso.value;
-  if (!cursoId) {
-    alert("Selecione um curso para editar");
-    return;
-  }
+  if (!cursoId) return;
 
   const updatedCurso = {
     title: inputCursoTitulo.value,
     description: inputCursoDescricao.value,
-    imageUrl: inputCursoImagem.value,
+    imageUrl: inputCursoImagem.value
   };
 
   try {
     const res = await fetch(`http://localhost:3000/cursos/${cursoId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedCurso),
+      body: JSON.stringify(updatedCurso)
     });
     if (!res.ok) throw new Error("Erro ao atualizar curso");
-    alert("Curso atualizado com sucesso");
-    await carregarCursos(); // Atualiza lista de cursos
-    selectCurso.value = cursoId; // mantém seleção
+
+    showAlert("Curso atualizado com sucesso");
+    await carregarCursos();
+    selectCurso.value = cursoId;
   } catch (error) {
-    alert(error.message);
+    showAlert(error.message, "danger");
     console.error(error);
   }
 });
 
-// Excluir curso
+// === Excluir curso ===
 btnExcluirCurso.addEventListener("click", async () => {
   const cursoId = selectCurso.value;
   if (!cursoId) {
-    alert("Selecione um curso para excluir");
+    showAlert("Selecione um curso para excluir", "danger");
     return;
   }
-  if (!confirm("Tem certeza que deseja excluir este curso?")) return;
+
+  const confirmado = await showConfirm("Tem certeza que deseja excluir este curso?");
+  if (!confirmado) return;
 
   try {
     const res = await fetch(`http://localhost:3000/cursos/${cursoId}`, {
-      method: "DELETE",
+      method: "DELETE"
     });
     if (!res.ok) throw new Error("Erro ao excluir curso");
-    alert("Curso excluído com sucesso");
+
+    showAlert("Curso excluído com sucesso");
     await carregarCursos();
     selectCurso.value = "";
     limparFormularioCurso();
     desabilitarFormularioCurso();
 
-    selectAula.value = "";
     limparFormularioAula();
     desabilitarFormularioAula();
     selectAula.disabled = true;
+    selectAula.innerHTML = '<option value="">-- Selecione uma aula --</option>';
   } catch (error) {
-    alert(error.message);
+    showAlert(error.message, "danger");
     console.error(error);
   }
 });
 
-// Salvar aula
+// === Atualizar aula ===
 formAula.addEventListener("submit", async (e) => {
   e.preventDefault();
   const aulaId = selectAula.value;
-  if (!aulaId) {
-    alert("Selecione uma aula para editar");
-    return;
-  }
+  if (!aulaId) return;
 
-  const courseId = selectCurso.value;
   const updatedAula = {
     title: inputAulaTitulo.value,
     description: inputAulaDescricao.value,
     url: inputAulaUrl.value,
-    courseId,
+    courseId: selectCurso.value
   };
 
   try {
     const res = await fetch(`http://localhost:3000/aulas/${aulaId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedAula),
+      body: JSON.stringify(updatedAula)
     });
     if (!res.ok) throw new Error("Erro ao atualizar aula");
-    alert("Aula atualizada com sucesso");
+
+    showAlert("Aula atualizada com sucesso");
   } catch (error) {
-    alert(error.message);
+    showAlert(error.message, "danger");
     console.error(error);
   }
 });
 
-// Excluir aula
+// === Excluir aula ===
 btnExcluirAula.addEventListener("click", async () => {
   const aulaId = selectAula.value;
   if (!aulaId) {
-    alert("Selecione uma aula para excluir");
+    showAlert("Selecione uma aula para excluir", "danger");
     return;
   }
-  if (!confirm("Tem certeza que deseja excluir esta aula?")) return;
+
+  const confirmado = await showConfirm("Tem certeza que deseja excluir esta aula?");
+  if (!confirmado) return;
 
   try {
     const res = await fetch(`http://localhost:3000/aulas/${aulaId}`, {
-      method: "DELETE",
+      method: "DELETE"
     });
     if (!res.ok) throw new Error("Erro ao excluir aula");
-    alert("Aula excluída com sucesso");
 
-    // Atualiza select de aulas para o curso selecionado
+    showAlert("Aula excluída com sucesso");
+
+    // Atualiza lista de aulas
     const cursoId = selectCurso.value;
     if (cursoId) {
       const resCurso = await fetch(`http://localhost:3000/cursos/${cursoId}`);
       const curso = await resCurso.json();
 
-      if (curso.classes && curso.classes.length) {
-        selectAula.innerHTML =
-          '<option value="">-- Selecione uma aula --</option>';
-        curso.classes.forEach((aula) => {
+      if (curso.classes && curso.classes.length > 0) {
+        selectAula.innerHTML = '<option value="">-- Selecione uma aula --</option>';
+        curso.classes.forEach(aula => {
           const option = document.createElement("option");
           option.value = aula.id;
           option.textContent = aula.title;
@@ -268,8 +303,7 @@ btnExcluirAula.addEventListener("click", async () => {
         });
         selectAula.disabled = false;
       } else {
-        selectAula.innerHTML =
-          '<option value="">-- Nenhuma aula cadastrada --</option>';
+        selectAula.innerHTML = '<option value="">-- Nenhuma aula cadastrada --</option>';
         selectAula.disabled = true;
       }
     }
@@ -277,10 +311,10 @@ btnExcluirAula.addEventListener("click", async () => {
     limparFormularioAula();
     desabilitarFormularioAula();
   } catch (error) {
-    alert(error.message);
+    showAlert(error.message, "danger");
     console.error(error);
   }
 });
 
-// Inicializa carregando cursos no select
+// === Inicializa ===
 carregarCursos();

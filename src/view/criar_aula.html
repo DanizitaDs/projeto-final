@@ -39,7 +39,7 @@
     </header>
     <div id="search-results"></div>
     <!-- ▸▸ CONTEÚDO PRINCIPAL ◂◂ -->
-    <div class="form-container-aula">
+    <div class="form-container-aula-criar">
       <h2 class="mb-4">Criar Nova Aula</h2>
       <div class="mb-3">
         <label for="curso-select" class="form-label">Selecione um Curso</label>
@@ -79,7 +79,7 @@
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-content">
-        <i class="fab fa-instagram"></i>
+        <a class="fab fa-instagram" href="https://www.instagram.com/communitycourse/"target="_blank"></a>
       </div>
     </footer>
 
@@ -89,7 +89,7 @@
         <div class="overlay-button-menu"><a href="editar.html" class="text-decoration-none text-white"><i class="fas fa-edit"></i> Editar Cursos/Aulas</a></div>
         <div class="overlay-button-menu"><a href="criar_cursos.html" class="text-decoration-none text-white"><i class="fa fa-plus"></i>Criar Cursos</a></div>
         <div class="overlay-button-menu"><a href="criar_aula.html" class="text-decoration-none text-white"><i class="fa fa-plus"></i> Criar Aulas</a></div>
-        <div class="overlay-button-menu"><a href="https://wa.me/5551999495754" class="text-decoration-none text-white"><i class="fas fa-headphones"></i> Suporte </a></div>
+        <div class="overlay-button-menu"><a href="https://mailto:comcoursetds@gmail.com" target="_blank"class="text-decoration-none text-white"><i class="fas fa-headphones"></i> Suporte </a></div>
         <div class="overlay-button-menu text-white" onclick="excluirConta()"><i class="fas fa-cog"></i> Excluir Conta</div>
         <div id="red-menu" class="overlay-button text-red" onclick="sair()"><i class="fa fa-sign-out" ></i> Sair</div>
       </div>
@@ -101,6 +101,8 @@
         <button class="sair" onclick="sair()">Sair</button>
       </div>
     </div>
+<!-- Container de alertas -->
+<div id="alert-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1055;"></div>
 
     <script src="./js/overlay.js"></script>
     <script src="./js/criar_aular.js"></script>

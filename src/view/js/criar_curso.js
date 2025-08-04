@@ -16,7 +16,7 @@ enviarBtn.addEventListener("click", async () => {
   const imagem = imagemInput.value.trim();
 
   if (!nome || !descricao || !imagem) {
-    alert("Preencha todos os campos.");
+    showAlert("Preencha todos os campos.");
     return;
   }
 
@@ -39,7 +39,7 @@ enviarBtn.addEventListener("click", async () => {
 
     aulaOverlay.style.display = "flex";
   } catch (error) {
-    alert("Erro ao criar o curso.");
+    showAlert("Erro ao criar o curso.");
     console.error(error);
   }
 });
@@ -50,7 +50,7 @@ salvarAulaBtn.addEventListener("click", async () => {
   const url = aulaUrl.value.trim();
 
   if (!titulo || !descricao || !url || !cursoIdCriado) {
-    alert("Preencha todos os campos da aula.");
+    showAlert("Preencha todos os campos da aula.");
     return;
   }
 
@@ -68,14 +68,36 @@ salvarAulaBtn.addEventListener("click", async () => {
 
     if (!response.ok) throw new Error("Erro ao criar aula");
 
-    alert("Aula criada com sucesso!");
+    showAlert("Aula criada com sucesso!");
     aulaOverlay.style.display = "none";
     window.location.reload();
   } catch (error) {
-    alert("Erro ao criar a aula.");
+    showAlert("Erro ao criar a aula.");
     console.error(error);
   }
 });
+
+ // Alerta visual com Bootstrap
+ function showAlert(message, type = "success", timeout = 3000) {
+  const alertContainer = document.getElementById("alert-container");
+  if (!alertContainer) return;
+
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = `
+    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+  `;
+
+  const alertElement = wrapper.firstElementChild;
+  alertContainer.appendChild(alertElement);
+
+  setTimeout(() => {
+    const alertInstance = bootstrap.Alert.getOrCreateInstance(alertElement);
+    alertInstance.close();
+  }, timeout);
+}
 
 async function carregarCursos() {
   try {
