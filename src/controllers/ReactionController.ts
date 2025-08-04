@@ -6,11 +6,9 @@ import { IReaction, IRequestReaction } from "../interfaces/IReaction";
 
 export class ReactionController {
   private reactionService: ReactionService;
-  private reactionRepository: ReactionRepository;
 
   constructor() {
     this.reactionService = new ReactionService();
-    this.reactionRepository = new ReactionRepository();
   }
 
   async create(request: Request, response: Response): Promise<Response> {

@@ -3,6 +3,7 @@ import { ICourse } from "../interfaces/ICourse";
 import { IReaction, IReactionRepository, IReactionValidation, IRequestReaction } from "../interfaces/IReaction";
 import { Classes } from "../models/Classes";
 import { Course } from "../models/Course";
+import { Reaction } from "../models/Reaction";
 import { ClassesRepository } from "../repositories/ClassesRepository";
 import { CourseRepository } from "../repositories/CourseRepository";
 import { ReactionRepository } from "../repositories/ReactionRepository";
@@ -27,6 +28,25 @@ export class ReactionService {
   async createReaction(data: IRequestReaction): Promise<IReaction> {
     const errorLocation = "Error in ReactionService.createReaction()."
     const {user, course, classe} = await this.validateReactionData(data, errorLocation);
+
+    const reactionsFound: Reaction[] | null = await this.reactionRepository.findByUserId(data.userId);
+
+    //Verificar se existe outra reaction com mesmo UserId e mesma relação que a relação sendo criada
+    reactionsFound?.forEach((reaction)=>{
+      if(
+        reaction.course //Tem relacionamento com curso?
+        && reaction.course.id // O (ICourse.)id existe? É imprescindível que exista.
+        && course// É o relacionamento da reaction sendo criada?
+        && course.id // "? É imprescindível que exista.
+        && reaction.course.id == course.id // Descobre se tem a mesma relação que a reaction sendo criada.
+        ){
+          new AppError(errorLocation + "Erro ao ")
+      } 
+
+      if(reaction.classes && reaction.classes.id == classe?.id){
+
+      }
+    })//Outras formas possiveis de fazer isso existem
         
     const reactionData:IReaction = {
       id: data.id,
@@ -50,6 +70,10 @@ export class ReactionService {
 
   async getAllReactions(): Promise<IReaction[]> {
     return await this.reactionRepository.findAll();
+  }
+
+  async getReactionByUserId(userId:number): Promise<IReaction[] | null>{
+    return await this.reactionRepository.findByUserId(userId);
   }
 
   async updateReaction(id: number, data: IRequestReaction): Promise<IReaction> {
@@ -115,6 +139,6 @@ export class ReactionService {
     }
 
     //Retornando as entidades
-    return {user, course, classe }
+    return {user, course, classe}
   }
 }

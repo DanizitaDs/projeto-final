@@ -34,6 +34,19 @@ export class ReactionRepository{
         })
     }
 
+    async findByUserId(userId:number):Promise<Reaction[] | null>{
+        return await this.repository.find({
+            where:{
+                user: {id:userId}//Desse modo é possivel encontrar sem precisar de uma instancia de um usuario
+            },
+            relations:{
+                classes: true,
+                user: true,
+                course: true
+            }
+        })
+    }
+
     /**
    * 
    * @returns Retorna todas as Reactions e suas relações.
