@@ -19,7 +19,7 @@ export class Course implements ICourse {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @OneToMany(() => Classes, (classes) => classes.courses)
+  @OneToMany(() => Classes, (classes) => classes.course)
   @JoinTable() // Associa tabela para gerenciar a relação muitos-para-muitos
   classes: IClasses[]; // Relacionamento muitos-para-muitos com aulas
 
@@ -34,4 +34,23 @@ export class Course implements ICourse {
 
   @Column({ nullable: true })
   externalLink?: string;
+
+  @OneToMany(() => Reaction, (reaction) => reaction.course )
+  reactions:IReaction[];
+
+  // @ManyToOne(() => User, (user:User) => user.createdCourses)
+  // userCreator:IUser;
+
+  // @Column({type:"date", nullable:false})
+  // public data:Date;
+
+  // @OneToMany(() => Comentario, comentario => comentario.postagem)
+  // @JoinColumn({ name: "postId" })
+  // public comentarios!: Comentario[]
+
+  // constructor(title: string, description: string, imageUrl: string) {
+  //   this.title = title;
+  //   this.description = description;
+  //   this.imageUrl = imageUrl;
+  // }
 }

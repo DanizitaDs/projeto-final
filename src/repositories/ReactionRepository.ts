@@ -9,7 +9,7 @@ export class ReactionRepository{
     private repository: Repository<Reaction>
 
     constructor(){
-        this.repository = AppDataSource.getMongoRepository(Reaction);
+        this.repository = AppDataSource.getRepository(Reaction);
     }
 
     async create(data:IReaction):Promise<Reaction>{

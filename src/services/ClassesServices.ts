@@ -16,9 +16,9 @@ export class ClassesService {
     this.validateClassesData(data);
     console.log("data", data);
 
-    const courses = await this.courseRepository.findById(data.courseId);
-    console.log("courses", courses);
-    if (!courses) {
+    const course = await this.courseRepository.findById(data.courseId);
+    console.log("course", course);
+    if (!course) {
       throw new AppError("Course not found", 404);
     }
 
@@ -26,7 +26,7 @@ export class ClassesService {
       title: data.title,
       description: data.description,
       url: data.url,
-      courses, // Associate course using ID received
+      course, // Associate course using ID received
     };
 
     return await this.classesRepository.create(classData);
@@ -47,8 +47,8 @@ export class ClassesService {
   async updateClass(id: number, data: IRequestClasses): Promise<IClasses> {
     this.validateClassesData(data);
 
-    const courses = await this.courseRepository.findById(data.courseId);
-    if (!courses) {
+    const course = await this.courseRepository.findById(data.courseId);
+    if (!course) {
       throw new AppError("Course not found", 404);
     }
 
@@ -56,7 +56,7 @@ export class ClassesService {
       title: data.title,
       description: data.description,
       url: data.url,
-      courses, // Associate course using ID received
+      course, // Associate course using ID received
     };
     return await this.classesRepository.update(id, classData);
   }

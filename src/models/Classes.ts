@@ -25,7 +25,7 @@ export class Classes implements IClasses {
   url: string;
 
   @ManyToOne(() => Course, (course) => course.classes)
-  courses: ICourse; // Relacionamento com cursos
+  course: ICourse; // Relacionamento com cursos
 
   @OneToMany(() => Reaction, (reaction:Reaction) => reaction.classes )
   reactions:Reaction[];

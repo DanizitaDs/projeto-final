@@ -5,7 +5,8 @@ export interface IClasses {
   title: string;
   description: string;
   url: string;
-  courses: ICourse;
+  course: ICourse;
+  
 }
 
 export interface IRequestClasses {

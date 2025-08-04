@@ -1,5 +1,6 @@
 import { User } from "../models/User";
 import { IClasses } from "./IClasses";
+import { IReaction } from "./IReaction";
 import { IUser } from "./IUser";
 
 export interface ICourse {
@@ -9,6 +10,7 @@ export interface ICourse {
   imageUrl: string;
   externalLink?: string;
   classes?: IClasses[];
+  reactions?: IReaction[];
   // userCreator: IUser
 }
 

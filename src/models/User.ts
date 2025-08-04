@@ -30,6 +30,12 @@ export class User {
 
   @Column({ type: "varchar", length: 255, nullable: false })
   password: string;
+  
+  // @OneToMany( () => Course, (course) => course.userCreator)
+  // createdCourses:ICourse[]
+
+  @OneToMany(() => Reaction, (reaction) => reaction.user)
+  reactions: IReaction[]
 
   constructor(name: string, email: string, password: string) {
     this.name = name;

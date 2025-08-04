@@ -10,8 +10,8 @@ export interface IUser {
   email: string;
   password: string;
   profileUrl?: string;
-  // createdCourses?: ICourse[];
-  // reactions: IReaction[];
+  //createdCourses?: ICourse[];
+  reactions?: IReaction[];
 }
 
 export interface IRequestUser {

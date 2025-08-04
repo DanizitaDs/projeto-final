@@ -18,6 +18,12 @@ export interface IRequestReaction {
   reaction: "like" | "dislike"
 }
 
+export interface IReactionValidation{
+  user:IUser,
+  course?:ICourse,
+  classe?:IClasses
+}
+
 export interface IReactionRepository {
   create(data: IClasses): Promise<IClasses>;
   findById(id: number): Promise<IClasses | null>;

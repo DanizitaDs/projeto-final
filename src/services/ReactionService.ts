@@ -1,4 +1,6 @@
-import { IReaction, IReactionRepository, IRequestReaction } from "../interfaces/IReaction";
+import { IClasses } from "../interfaces/IClasses";
+import { ICourse } from "../interfaces/ICourse";
+import { IReaction, IReactionRepository, IReactionValidation, IRequestReaction } from "../interfaces/IReaction";
 import { Classes } from "../models/Classes";
 import { Course } from "../models/Course";
 import { ClassesRepository } from "../repositories/ClassesRepository";
@@ -8,100 +10,73 @@ import { UserRepository } from "../repositories/UserRepository";
 import { AppError } from "../utils/AppError";
 
 
-export class CourseService {
+export class ReactionService {
   private courseRepository: CourseRepository;
   private classRepository: ClassesRepository;
   private userRepository: UserRepository;
+  private reactionRepository: ReactionRepository;
 
   constructor() {
     this.courseRepository = new CourseRepository();
     this.classRepository = new ClassesRepository();
+    this.userRepository = new UserRepository()
+    this.reactionRepository = new ReactionRepository()
+
   }
 
   async createReaction(data: IRequestReaction): Promise<IReaction> {
-    const localError = "Error in CourseService.createCourse()."
-    this.validateReactionData(data);
-    let classe;
-    let course;
-
-    if (data.classeId) {
-        classe = await this.classRepository.findById(data.classeId);
-        if(!classe){
-            throw new AppError(`classe not found. classeId: ${data.classeId}`)
-        }
-    } else if(data.courseId){
-        course = await this.classRepository.findById(data.courseId)
-        if(!course){
-            throw new AppError(`course not found. courseId: ${data.courseId}`)
-        }
-    } else{
-        throw new AppError(`${localError}  Either courseId or classId is required`, 400);
-    }
-
-    let user = await this.userRepository.findById(data.userId);
-
-    if(!user){
-      throw new AppError(`${localError} User not found. userId: ${data.userId}`, 404)
-    }
-
-    const courseData:ICourse = {
-      title: data.title,
-      description: data.description,
-      imageUrl: data.imageUrl,
-      externalLink: data.externalLink,
-      classes: classes, // Atribui as aulas encontradas ao curso
-      userCreator: userCreator
+    const errorLocation = "Error in ReactionService.createReaction()."
+    const {user, course, classe} = await this.validateReactionData(data, errorLocation);
+        
+    const reactionData:IReaction = {
+      id: data.id,
+      user: user,
+      course: course,
+      classe: classe,
+      reaction: data.reaction
     };
-    return await this.courseRepository.create(courseData);
+
+    return await this.reactionRepository.create(reactionData);
   }
 
-  async getCourseById(id: number): Promise<ICourse> {
-    const course = await this.courseRepository.findById(id);
+  async getReactionById(id: number): Promise<IReaction> {
+    const reaction = await this.reactionRepository.findById(id);
 
-    if (!course) {
-      throw new AppError("Course not found", 404);
+    if (!reaction) {
+      throw new AppError("Reaction not found", 404);
     }
-
-    return course;
+    return reaction;
   }
 
-  async getAllCourses(): Promise<ICourse[]> {
-    return await this.courseRepository.findAll();
+  async getAllReactions(): Promise<IReaction[]> {
+    return await this.reactionRepository.findAll();
   }
 
-  async updateCourse(id: number, data: IRequestCourse): Promise<ICourse> {
-    this.validateReactionData(data);
-    // Obtenha os IDs das aulas e busque as aulas correspondentes no banco
-    let classes;
-    if (data.classesId && data.classesId.length > 0) {
-      classes = await this.classRepository.findByIds(data.classesId); // Supondo que exista um repositório para Classes
-    }
+  async updateReaction(id: number, data: IRequestReaction): Promise<IReaction> {
+    const errorLocation = "Error in ReactionService.updateReaction()."
+    const {user, course, classe} = await this.validateReactionData(data, errorLocation);
 
-    let userCreator = await this.userRepository.findById(data.userId)
-
-    if(!userCreator){
-      throw new AppError(`Error in CourseService.createCourse() -> User not found. userId: ${data.userId}`, 404)
-    }
-
-    const courseData:ICourse = {
-      title: data.title,
-      description: data.description,
-      imageUrl: data.imageUrl,
-      externalLink: data.externalLink,
-      classes: classes, // Atribui as aulas encontradas ao curso
-      userCreator: userCreator
+    const reactionData:IReaction = {
+      id: data.id,
+      user: user,
+      course: course,
+      classe: classe,
+      reaction: data.reaction
     };
-    return await this.courseRepository.update(id, courseData);
+
+    return await this.reactionRepository.update(id, reactionData);
   }
 
-  async deleteCourse(id: number): Promise<void> {
+  async deleteReaction(id: number): Promise<void> {
     await this.courseRepository.delete(id);
   }
 
   /**
-   * Valida os dados do usuário, garantindo que estejam corretos.
-   */
-  private validateReactionData(data: IRequestReaction): void {
+  * Valida os dados da Reaction, garantindo que estejam corretos.
+  * Garante que contenha extamente um relacionamento, courseId ou classId.
+  * Verifica se os ids correspondem a um registro no banco de dados.
+  */
+   private async validateReactionData(data: IRequestReaction, errorLocation:string):Promise<IReactionValidation>  {
     if (!data.userId) {
       throw new AppError("userId is required", 400);
     }
@@ -113,6 +88,33 @@ export class CourseService {
     if (!data.courseId || !data.classeId) {
       throw new AppError("Either courseId or classId is required", 400);
     }
+    
+    //Variaveis que serão retornadas
+    let user, course, classe;
 
+    user = await this.userRepository.findById(data.userId);
+    
+    //Verificando se usuario com id informado existe
+    if(!user){
+      throw new AppError(`${errorLocation} User not found. userId: ${data.userId}`, 404)
+    }
+
+    //Verificando se existe uma classeId ou um courseId na reaction e se tal existe no banco de dados
+    if (data.classeId) {
+        classe = await this.classRepository.findById(data.classeId);
+        if(!classe){
+            throw new AppError(`${errorLocation} classe not found. classeId: ${data.classeId}`)
+        }
+    } else if(data.courseId){
+        course = await this.courseRepository.findById(data.courseId)
+        if(!course){
+            throw new AppError(`${errorLocation} course not found. courseId: ${data.courseId}`)
+        }
+    } else{
+        throw new AppError(`${errorLocation} Either courseId or classId is required`, 400);
+    }
+
+    //Retornando as entidades
+    return {user, course, classe }
   }
 }
