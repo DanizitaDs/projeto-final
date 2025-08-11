@@ -29,25 +29,6 @@ export class ReactionService {
     const errorLocation = "Error in ReactionService.createReaction()."
     const {user, course, classe} = await this.validateReactionData(data, errorLocation);
 
-    const reactionsFound: Reaction[] | null = await this.reactionRepository.findByUserId(data.userId);
-
-    //Verificar se existe outra reaction com mesmo UserId e mesma relação que a relação sendo criada
-    reactionsFound?.forEach((reaction)=>{
-      if(
-        reaction.course //Tem relacionamento com curso?
-        && reaction.course.id // O (ICourse.)id existe? É imprescindível que exista.
-        && course// É o relacionamento da reaction sendo criada?
-        && course.id // "? É imprescindível que exista.
-        && reaction.course.id == course.id // Descobre se tem a mesma relação que a reaction sendo criada.
-        ){
-          new AppError(errorLocation + "Erro ao ")
-      } 
-
-      if(reaction.classes && reaction.classes.id == classe?.id){
-
-      }
-    })//Outras formas possiveis de fazer isso existem
-        
     const reactionData:IReaction = {
       id: data.id,
       user: user,
@@ -56,7 +37,31 @@ export class ReactionService {
       reaction: data.reaction
     };
 
-    return await this.reactionRepository.create(reactionData);
+    const reactionsFound: Reaction[] | null = await this.reactionRepository.findByUserId(data.userId);
+
+    let validatedReaction:boolean = true;
+
+    //Verificar se existe outra reaction com mesmo UserId e mesma relação que a relação sendo criada
+    try{
+      reactionsFound?.forEach((reaction)=>{
+        if(reaction.course?.id == course?.id){
+          validatedReaction = false;
+        } else if(reaction.classes?.id == classe?.id){
+          validatedReaction = false
+        }
+      })
+
+    } catch(error){
+      throw new AppError(`${errorLocation} ${error}`);
+    }
+    
+    if(validatedReaction){
+      return await this.reactionRepository.create(reactionData);
+
+    } else{
+      throw new AppError(`${errorLocation} Outra reaction com mesmo relacionamento já existe`);
+    }
+
   }
 
   async getReactionById(id: number): Promise<IReaction> {
@@ -109,7 +114,7 @@ export class ReactionService {
       throw new AppError("reactionId is required", 400);
     }
 
-    if (!data.courseId || !data.classeId) {
+    if (!(data.courseId || data.classeId)) {
       throw new AppError("Either courseId or classId is required", 400);
     }
     
