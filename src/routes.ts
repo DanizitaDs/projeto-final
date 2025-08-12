@@ -45,7 +45,11 @@ routes.put("/aulas/:id", (req, res) => classesController.update(req, res)); // A
 routes.delete("/aulas/:id", (req, res) => classesController.delete(req, res)); // Deletar aula
 
 
-routes.post("/reaction", (req, res) => reactionController.create(req, res))
+routes.post("/reactions", (req, res) => reactionController.create(req, res))// Cria uma reação
 routes.get("/reactions/:id", (req, res) => reactionController.findById(req, res))
+routes.get("/reactions/byUser/:userId", (req, res) => reactionController.findByUser(req, res))
+routes.get("/reactions", (req, res) => reactionController.findAll(req,res))
+routes.put("/reactions/:id", (req, res) => reactionController.update(req, res))
+routes.delete("/reactions/:id", (req, res) => reactionController.delete(req, res))
 
 export { routes };

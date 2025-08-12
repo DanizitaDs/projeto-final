@@ -21,16 +21,24 @@ export class ReactionRepository{
     async findById(id:number): Promise<Reaction | null>{
         return await this.repository.findOne({
             where: { id },
-            relations: ["classes, user, course"]
+            relations: {
+                classes:true,
+                user:true,
+                course:true
+            }
         })
     }
 
-    async findByIds(ids: number[]):Promise<Reaction[]>{
+    async findByIds(ids: number[]):Promise<Reaction[]>{//Não utilizado
         return await this.repository.find({
             where:{
                 id: In([ids])
             },
-            relations: ["classes, user, course"]
+            relations: {
+                classes:true,
+                user:true,
+                course:true
+            }
         })
     }
 

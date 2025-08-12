@@ -29,7 +29,6 @@ export interface IReactionRepository {
   create(data: IClasses): Promise<IClasses>;
   findById(id: number): Promise<IClasses | null>;
   findByUser(userId:number): Promise<IUser[] | null>;//Fazendo
-  findByIds(number: []): Promise<IClasses[] | null>;
   findAll(): Promise<IClasses[]>;
   update(id: number, data: IClasses): Promise<IClasses>;
   delete(id: number): Promise<void>;

@@ -97,7 +97,7 @@ export class ReactionService {
   }
 
   async deleteReaction(id: number): Promise<void> {
-    await this.courseRepository.delete(id);
+    await this.reactionRepository.delete(id);
   }
 
   /**

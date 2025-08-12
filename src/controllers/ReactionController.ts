@@ -22,6 +22,12 @@ export class ReactionController {
     const reaction = await this.reactionService.getReactionById(Number(id));
     return response.json(reaction);
   }
+
+  async findByUser(request: Request, response: Response): Promise<Response> {
+    const { userId } = request.params;
+    const reaction = await this.reactionService.getReactionByUserId(Number(userId));
+    return response.json(reaction);
+  }
   
   async findAll(request: Request, response: Response): Promise<Response> {
     const reaction = await this.reactionService.getAllReactions();
