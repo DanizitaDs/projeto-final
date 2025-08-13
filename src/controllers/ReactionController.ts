@@ -54,8 +54,6 @@ export class ReactionController {
         reaction
     };
 
-    console.log("OBJETO ENVIADO PARA getExactReaction:", data);
-
     const reactionFinded = await this.reactionService.getExactReaction(data);
     return response.json(reactionFinded);
 }
@@ -66,13 +64,9 @@ export class ReactionController {
     return response.json(reaction);
   }
 
-  async update(request: Request, response: Response): Promise<Response> {
-    const { id } = request.params;
+  async updateExact(request: Request, response: Response): Promise<Response> {
     const reactionData: IRequestReaction = request.body;
-    const reaction = await this.reactionService.updateReaction(
-      Number(id),
-      reactionData
-    );
+    const reaction = await this.reactionService.updateExactReaction(reactionData);
     return response.json(reaction);
   }
 

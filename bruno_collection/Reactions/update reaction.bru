@@ -1,10 +1,10 @@
 meta {
-  name: create Reaction
+  name: update reaction
   type: http
-  seq: 1
+  seq: 6
 }
 
-post {
+put {
   url: http://localhost:3000/reactions
   body: json
   auth: inherit
@@ -12,9 +12,9 @@ post {
 
 body:json {
   {
-    "userId": 1,
-    "courseId": 2,
-    "reaction": "dislike" 
+    "userId":1,
+    "courseId":1,
+    "reaction": "dislike"
   }
 }
 

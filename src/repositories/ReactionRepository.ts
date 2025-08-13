@@ -58,8 +58,7 @@ export class ReactionRepository{
      async findExact(data:IRequestReaction):Promise<Reaction | null>{
         try {
         const where: any = {
-            user: { id: data.userId },
-            reaction: data.reaction
+            user: { id: data.userId }
         };
 
         if (data.classeId !== undefined) {
@@ -69,7 +68,6 @@ export class ReactionRepository{
         if (data.courseId !== undefined) {
             where.course = { id: data.courseId };
         }
-        console.log("WHERE FINAL", where)
 
         return await this.repository.findOne({
             where,
@@ -80,7 +78,7 @@ export class ReactionRepository{
             }
         });
     } catch {
-        throw new AppError("Erro em rR.findExact");
+        throw new AppError("Error in rR.findExact");
     }
         
     }
@@ -95,7 +93,7 @@ export class ReactionRepository{
         })
     }
 
-    async update(id: number, data: IReaction):Promise<IReaction>{
+    async updateExact(id: number, data: IReaction):Promise<IReaction>{
         const result = await this.repository.update(id, data);
         if (result.affected === 0) {
             throw new AppError("Course not found", 404);
