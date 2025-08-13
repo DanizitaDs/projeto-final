@@ -44,16 +44,16 @@ export class ReactionService {
     //Verificar se existe outra reaction com mesmo UserId e mesma relação que a relação sendo criada
     try{
       reactionsFound?.forEach((reaction)=>{
-        if(reaction.course?.id == course?.id){
+        if(reaction.course?.id && reaction.course?.id == course?.id){
           validatedReaction = false;
-        } else if(reaction.classes?.id == classe?.id){
-          validatedReaction = false
+        } else if(reaction.classes?.id && reaction.classes?.id == classe?.id){
+          validatedReaction = false;
         }
       })
 
     } catch(error){
       throw new AppError(`${errorLocation} ${error}`);
-    }
+    }//Poderia utilizar tambem o reactionRepository.findExact()
     
     if(validatedReaction){
       return await this.reactionRepository.create(reactionData);
@@ -81,6 +81,11 @@ export class ReactionService {
     return await this.reactionRepository.findByUserId(userId);
   }
 
+  async getExactReaction(data: IRequestReaction): Promise<IReaction | null>{
+    const errorLocation = "Error in ReactionService.getExactReaction."
+    await this.validateReactionData(data, errorLocation);
+    return await this.reactionRepository.findExact(data);
+  }
   async updateReaction(id: number, data: IRequestReaction): Promise<IReaction> {
     const errorLocation = "Error in ReactionService.updateReaction()."
     const {user, course, classe} = await this.validateReactionData(data, errorLocation);

@@ -1,7 +1,7 @@
 import { In, Repository } from "typeorm";
 import { Reaction } from "../models/Reaction";
 import { AppDataSource } from "../database/connection";
-import { IReaction } from "../interfaces/IReaction";
+import { IReaction, IRequestReaction } from "../interfaces/IReaction";
 import { AppError } from "../utils/AppError";
 
 
@@ -55,13 +55,43 @@ export class ReactionRepository{
         })
     }
 
+     async findExact(data:IRequestReaction):Promise<Reaction | null>{
+        try {
+        const where: any = {
+            user: { id: data.userId },
+            reaction: data.reaction
+        };
+
+        if (data.classeId !== undefined) {
+            where.classes = { id: data.classeId };
+        }
+
+        if (data.courseId !== undefined) {
+            where.course = { id: data.courseId };
+        }
+        console.log("WHERE FINAL", where)
+
+        return await this.repository.findOne({
+            where,
+            relations: {
+                classes: true,
+                user: true,
+                course: true
+            }
+        });
+    } catch {
+        throw new AppError("Erro em rR.findExact");
+    }
+        
+    }
+
     /**
    * 
-   * @returns Retorna todas as Reactions e suas relações.
+   * @returns Retorna todas as Reactions.
    */
     async findAll():Promise<IReaction[]>{
         return await this.repository.find({
-            relations: ["classes, user, course"]
+            
         })
     }
 

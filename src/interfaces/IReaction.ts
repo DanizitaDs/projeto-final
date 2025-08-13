@@ -22,7 +22,6 @@ export interface IReactionValidation{
   user:IUser,
   course?:ICourse,
   classe?:IClasses,
-  
 }
 
 export interface IReactionRepository {

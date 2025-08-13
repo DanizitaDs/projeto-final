@@ -21,17 +21,26 @@ export class Reaction{
     @PrimaryGeneratedColumn()
     id!:number
 
-    @ManyToOne(() => User, (user:User) => user.reactions)
+    @ManyToOne(() => User, (user:User) => user.reactions, { onDelete: 'CASCADE'})
     user:User
+
+    @Column({type: "number", nullable:true})
+    userId?:number
 
     @Column({type:'varchar', length: 7})
     reaction: "like" | "dislike";
 
-    @ManyToOne(() => Course, (course) => course.reactions, { nullable:true })
+    @ManyToOne(() => Course, (course) => course.reactions, { nullable:true, onDelete: 'CASCADE'})
     course?:ICourse;
 
-    @ManyToOne(() => Classes, (classes) => classes.reactions, { nullable:true })
+    @Column({type: "number", nullable:true})
+    courseId?:number
+
+    @ManyToOne(() => Classes, (classes) => classes.reactions, { nullable:true,onDelete: 'CASCADE' })
     classes?:IClasses;
+
+    @Column({type: "number", nullable: true})
+    classesId?:number
 
     constructor(user:User, reacao:"like" | "dislike"){
         this.user = user;
