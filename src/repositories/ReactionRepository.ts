@@ -93,7 +93,7 @@ export class ReactionRepository{
         })
     }
 
-    async updateExact(id: number, data: IReaction):Promise<IReaction>{
+    async updateReaction(id: number, data: IReaction):Promise<IReaction>{
         const result = await this.repository.update(id, data);
         if (result.affected === 0) {
             throw new AppError("Course not found", 404);

@@ -30,7 +30,7 @@ export class ReactionService {
     const {user, course, classe} = await this.validateReactionData(data, errorLocation);
 
     const reactionData:IReaction = {
-      id: data.id,
+      id: undefined,
       user: user,
       course: course,
       classe: classe,
@@ -86,19 +86,34 @@ export class ReactionService {
     await this.validateReactionData(data, errorLocation);
     return await this.reactionRepository.findExact(data);
   }
-  async updateExactReaction(data: IRequestReaction): Promise<IReaction> {
+
+  async toggleReaction(data: IRequestReaction): Promise<IReaction | null> {
     const errorLocation = "Error in ReactionService.updateReaction()."
+    const {user, course, classe} = await this.validateReactionData(data, errorLocation);
     const reactionFinded = await this.getExactReaction(data);
+    
     if(!reactionFinded){
-      throw new AppError(`${errorLocation} reaction not found.`, 404)
+      const reactionData:IReaction = {
+        user: user,
+        course: course,
+        classe: classe,
+        reaction: data.reaction
+      };
+      
+      return await this.reactionRepository.create(reactionData)
     }
-    reactionFinded.reaction = data.reaction;
 
     if(!reactionFinded.id){
       throw new AppError(`${errorLocation} Id not returned.`, 500)
     }
 
-    return await this.reactionRepository.updateExact(reactionFinded.id, reactionFinded);
+    if(reactionFinded.reaction === data.reaction){
+      await this.reactionRepository.delete(reactionFinded.id)
+      return null
+    }
+
+    reactionFinded.reaction = data.reaction;
+    return await this.reactionRepository.updateReaction(reactionFinded.id, reactionFinded);
   }
 
   async deleteReaction(id: number): Promise<void> {
