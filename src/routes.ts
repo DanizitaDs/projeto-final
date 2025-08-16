@@ -18,6 +18,9 @@ routes.put("/users/:id", upload.single("profileImage"), userController.update); 
 routes.delete("/users/:id", userController.delete);
 routes.post("/usersLogin", userController.login);
 
+// Rotas relacionadas a role dos users
+// routes.post("/users/updateRole/:id", userController.updateRole); // Atualiza a role do usuário
+
 // Rotas para cursos
 routes.post("/cursos", (req, res) => courseController.create(req, res));
 routes.get("/cursos/:id", (req, res) => courseController.findById(req, res));

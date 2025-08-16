@@ -32,8 +32,8 @@ export class User {
   password: string;
   private shouldHash: boolean;
 
-  // @Column({ type: "varchar", length:7, nullable: false, default: "student" })
-  // role: "student" | "teacher" | "admin";
+  @Column({ type: "varchar", length:7, nullable: false, default: "student" })
+  role: "student" | "teacher" | "admin";
   
   //@OneToMany( () => Course, (course) => course.userCreator)
   //createdCourses:ICourse[]
