@@ -27,19 +27,45 @@ export class User {
 
   @Column({ type: "text", nullable: true })
   profileUrl?: string;
-
-  @Column({ type: "varchar", length: 255, nullable: false })
-  password: string;
   
-  // @OneToMany( () => Course, (course) => course.userCreator)
-  // createdCourses:ICourse[]
+  @Column({ type: "varchar", length: 255, nullable: false, select: false })
+  password: string;
+  private shouldHash: boolean;
+
+  // @Column({ type: "varchar", length:7, nullable: false, default: "student" })
+  // role: "student" | "teacher" | "admin";
+  
+  //@OneToMany( () => Course, (course) => course.userCreator)
+  //createdCourses:ICourse[]
 
   @OneToMany(() => Reaction, (reaction) => reaction.user)
   reactions: IReaction[]
-
-  constructor(name: string, email: string, password: string) {
+  
+  constructor(name:string, email: string, password: string) {
     this.name = name;
     this.email = email;
     this.password = password;
+    this.shouldHash = true;
+  }
+  
+  @AfterLoad()
+  private loadOriginal() {
+    this.shouldHash = false;
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword() {
+    if (this.shouldHash) {
+      const salt = await bcrypt.genSalt(10);
+      this.password = await bcrypt.hash(this.password, salt);
+      this.shouldHash = false;
+    }
+  }
+
+  toJSON() {
+    // remove shouldHash and password from the JSON representation
+    const { password, shouldHash, ...rest } = this;
+    return rest;
   }
 }

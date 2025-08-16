@@ -44,7 +44,7 @@ export class UserController {
     }
   }
 
-  async login(req: Request, res: Response) {
+  async login(req: Request, res: Response):Promise<Response> {
     try {
       const { email, password } = req.body;
 
@@ -52,15 +52,18 @@ export class UserController {
         throw new AppError("Usuário e senha devem ser informados", 400);
       }
 
-      const user = await userRepository.findOneBy({ email });
+      const user = await userRepository.findOne({
+        where: { email },
+        select: ["id", "password", "profileUrl"]
+        });
 
       if (!user) {
         throw new AppError("Usuario não encontrado", 404);
       }
 
       // const isValid = await bcryptjs.compare(password, user.password);
-
-      if (user.password !== password) {
+      const isValid = await bcryptjs.compare(password, user.password);
+      if (!isValid) {
         throw new AppError("Senha inválida", 401);
       }
 
