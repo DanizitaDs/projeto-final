@@ -4,6 +4,7 @@ import { ClassesController } from "./controllers/ClassesController"; // Importa 
 import { UserController } from "./controllers/userController";
 import { upload } from "./services/UserService"; // Import the upload middleware
 import { ReactionController } from "./controllers/ReactionController";
+import { authMiddleware } from "./middlewares/authMiddleware";
 
 const routes = Router();
 const courseController = new CourseController();
@@ -11,10 +12,11 @@ const classesController = new ClassesController(); // Cria uma instância do con
 const userController = new UserController();
 const reactionController = new ReactionController();
 
+routes.get("/profile", authMiddleware ,userController.getProfile) // Logged in user
+routes.put("/users", authMiddleware, upload.single("profileImage"), userController.update); // Add upload middleware
 routes.get("/users", userController.findAll);
 routes.post("/users", upload.single("profileImage"), userController.create); // Add upload middleware
 routes.get("/users/:id", userController.findById);
-routes.put("/users/:id", upload.single("profileImage"), userController.update); // Add upload middleware
 routes.delete("/users/:id", userController.delete);
 routes.post("/usersLogin", userController.login);
 

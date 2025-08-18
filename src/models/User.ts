@@ -63,6 +63,8 @@ export class User {
     }
   }
 
+  
+
   toJSON() {
     // remove shouldHash and password from the JSON representation
     const { password, shouldHash, ...rest } = this;

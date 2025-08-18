@@ -32,10 +32,30 @@ export interface IUserRequestWithFile {
   profileImage?: Express.Multer.File;
 }
 
+export interface IUserUpdate {
+  id: number;
+  name?: string;
+  email?: string;
+  password?: string;
+  profileUrl?: string;
+}
+
+export interface IRequestUserUpdate {
+  name?: string;
+  email?: string;
+  password?: string;
+  profileUrl?: string;
+}
+
+export interface IUserWithToken{
+  user:IUser,
+  token: string
+}
+
 export interface IUserRepository {
   create(data: IUser): Promise<IUser>;
   findById(id: number): Promise<IUser | null>;
-  update(id: number, data: IUser): Promise<IUser>;
+  update(data: IUserUpdate): Promise<IUser>;
   delete(id: number): Promise<void>;
   //getReactions()            |
   //getReactionById()         |

@@ -1,5 +1,8 @@
+import getProfile from "./user-script/getProfile.js";
+
 document.addEventListener("DOMContentLoaded", async () => {
-  const userId = localStorage.getItem("userId");
+  const user = await getProfile()
+  const userId = user.id
   if (!userId) {
     alertShow("Usuário não está logado.", "error");
     setTimeout(() => {
@@ -38,10 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    const response = await fetch(`http://localhost:3000/users/${userId}`);
-    if (!response.ok) throw new Error("Erro ao buscar usuário");
-
-    userData = await response.json();
+    const userData = await getProfile()
 
     document.getElementById("user-name-display").textContent = userData.name || "Usuário";
     document.getElementById("user-email-display").textContent = userData.email || "email@exemplo.com";
@@ -54,8 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         : `http://localhost:3000${userData.profileUrl}`;
       renderProfileImage(fullUrl);
     }
-  } catch (error) {
-    console.error("Erro ao carregar dados do usuário:", error);
+  } catch {
     alertShow("Erro ao carregar perfil do usuário.", "error");
   }
 
@@ -128,9 +127,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       }, 200);
 
-      const response = await fetch(`http://localhost:3000/users/${userId}`, {
+      const response = await fetch(`http://localhost:3000/users`, {
         method: "PUT",
         body: formData,
+        headers:{"Authorization": `Bearer ${localStorage.getItem("token")}`}
       });
 
       clearInterval(progressInterval);

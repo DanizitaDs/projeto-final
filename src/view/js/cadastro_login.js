@@ -1,3 +1,5 @@
+import loginUser from "./user-script/loginUser.js";
+
 // Alternância de telas
 const loginBtn = document.querySelector(".login-btn");
 const registerBtn = document.querySelector(".register-btn");
@@ -70,24 +72,18 @@ loginForm.addEventListener("submit", async (e) => {
   const email = document.getElementById("loginEmail").value;
   const password = document.getElementById("loginPassword").value;
 
-  try {
-    const res = await fetch("http://localhost:3000/usersLogin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await res.json();
-
-    if (res.ok && data && data.id) {
-      localStorage.setItem("userId", data.id);
-      localStorage.setItem("profileUrl", data.profileUrl);
+  try{
+    const data = await loginUser(email, password);
+    if (data && data.user.id) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("profileUrl", data.user.profileUrl);
       showAlert("Login realizado com sucesso!", "success");
       window.location.href = "index.html";
     } else {
-      showAlert(data.message || "Erro ao fazer login", "danger");
+      showAlert("Senha ou email incorretos");
     }
   } catch (err) {
     showAlert("Erro ao conectar com o servidor", "danger");
   }
+
 });

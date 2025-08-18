@@ -1,30 +1,16 @@
+import getProfile from "./user-script/getProfile.js";
+
 // Redireciona se não estiver logado
-document.addEventListener("DOMContentLoaded", () => {
-  const userId = localStorage.getItem("userId");
-  if (!userId) {
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await getProfile()
+  if (!user) {
     showAlert("Você precisa estar logado para acessar esta página.");
     window.location.href = "cadastro_login.html";
     return;
   }
 
-  carregarUsuarioLogado();
   loadCourses();
 });
-
-async function carregarUsuarioLogado() {
-  const userId = localStorage.getItem("userId");
-
-  try {
-    const res = await fetch(`http://localhost:3000/users/${userId}`);
-    if (!res.ok) throw new Error("Erro ao buscar usuário");
-
-    const user = await res.json();
-  } catch (error) {
-    console.error("Erro ao carregar usuário:", error);
-    localStorage.removeItem("userId");
-    window.location.href = "cadastro_login.html";
-  }
-}
 
 async function loadCourses() {
   try {

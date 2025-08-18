@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../database/connection";
 import { User } from "../models/User";
-import bcryptjs from "bcryptjs";
 import { UserService } from "../services/UserService";
-import { IRequestUser } from "../interfaces/IUser";
+import { IRequestUser, IRequestUserUpdate } from "../interfaces/IUser";
 import { AppError } from "../utils/AppError";
+import jwt from "jsonwebtoken";
+
+
 
 const userRepository = AppDataSource.getRepository(User);
 const userService = new UserService();
@@ -16,21 +18,44 @@ export class UserController {
    * @param req
    * @param res
    * @returns -> Retorna o usuario criado
-   */
-
-  async create(req: Request, res: Response): Promise<Response> {
+  */
+ 
+ async create(req: Request, res: Response): Promise<Response> {
+   try {
+     const userData: IRequestUser = req.body;
+     // Get the file from multer middleware
+     const profileImage = req.file;
+     
+     const user = await userService.createUser(userData, profileImage);
+     return res.status(201).json(user);
+    } catch (error: any) {
+      return res
+      .status(error.statusCode || 500)
+      .json({ message: error.message });
+    }
+  }
+  
+  async login(req: Request, res: Response):Promise<Response> {
     try {
-      const userData: IRequestUser = req.body;
-      // Get the file from multer middleware
-      const profileImage = req.file;
-
-      const user = await userService.createUser(userData, profileImage);
-      return res.status(201).json(user);
+      const { email, password } = req.body;
+      const userWithtoken = await userService.login(email, password)
+ 
+      return res.status(200).json({
+        user:userWithtoken?.user,
+        message: "Login bem-sucedido",
+        token: userWithtoken?.token
+        // id: user.id, // ESSENCIAL para salvar no localStorage
+        // profileUrl: user.profileUrl,
+      });
     } catch (error: any) {
       return res
         .status(error.statusCode || 500)
         .json({ message: error.message });
     }
+  }
+
+  async getProfile(req:Request, res:Response):Promise<Response> {
+    return res.json(req.user)
   }
 
   async findAll(req: Request, res: Response): Promise<Response> {
@@ -44,40 +69,6 @@ export class UserController {
     }
   }
 
-  async login(req: Request, res: Response):Promise<Response> {
-    try {
-      const { email, password } = req.body;
-
-      if (!email || !password) {
-        throw new AppError("Usuário e senha devem ser informados", 400);
-      }
-
-      const user = await userRepository.findOne({
-        where: { email },
-        select: ["id", "password", "profileUrl"]
-        });
-
-      if (!user) {
-        throw new AppError("Usuario não encontrado", 404);
-      }
-
-      // const isValid = await bcryptjs.compare(password, user.password);
-      const isValid = await bcryptjs.compare(password, user.password);
-      if (!isValid) {
-        throw new AppError("Senha inválida", 401);
-      }
-
-      return res.status(200).json({
-        message: "Login bem-sucedido",
-        id: user.id, // ESSENCIAL para salvar no localStorage
-        profileUrl: user.profileUrl,
-      });
-    } catch (error: any) {
-      return res
-        .status(error.statusCode || 500)
-        .json({ message: error.message });
-    }
-  }
 
   // Buscar usuário por ID
   async findById(req: Request, res: Response): Promise<Response> {
@@ -95,18 +86,24 @@ export class UserController {
   // Atualizar usuário
   async update(req: Request, res: Response): Promise<Response> {
     try {
-      const { id } = req.params;
-      const userData: IRequestUser = req.body;
+      const userRequest:IRequestUserUpdate = req.body
+      
+      const user = req.user
       // Get the file from multer middleware
       const profileImage = req.file;
 
-      const user = await userService.updateUser(
-        Number(id),
-        userData,
+      if(!user.id){
+        throw new AppError("id not returned", 500)
+      }
+
+      const newUser = await userService.updateUser(
+        user.id,
+        userRequest,
         profileImage
       );
-      console.log("OKKKKKKKKKK", user);
-      return res.json(user);
+
+      return res.json(newUser);
+
     } catch (error: any) {
       return res
         .status(error.statusCode || 500)

@@ -1,9 +1,13 @@
-import { IUser, IRequestUser } from "../interfaces/IUser";
+import { IUser, IRequestUser, IUserWithToken, IUserUpdate, IRequestUserUpdate } from "../interfaces/IUser";
 import { UserRepository } from "../repositories/UserRepository";
 import { AppError } from "../utils/AppError";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import bcryptjs from "bcryptjs";
+import jwt from "jsonwebtoken"
+
+
 
 // Configure multer storage
 const storage = multer.diskStorage({
@@ -56,6 +60,7 @@ export const upload = multer({
   },
 });
 
+// ------------------------------------------------------------------------------
 export class UserService {
   private userRepository: UserRepository;
 
@@ -81,27 +86,57 @@ export class UserService {
     return await this.userRepository.create(userData);
   }
 
+  async login(email:string, password: string): Promise<IUserWithToken | null> {
+    
+    if (!email || !password) {
+      throw new AppError("Usuário e senha devem ser informados", 400);
+    }
+    
+    const user = await this.userRepository.findByEmailWithPassword(email)
+    
+    if (user === null) {
+      throw new AppError("User not found", 404);
+    }
+    
+    // const isValid = await bcryptjs.compare(password, user.password);
+    const isValid = await bcryptjs.compare(password, user.password);
+    if (!isValid) {
+      throw new AppError("Senha inválida", 401);
+    }
+
+    const token = jwt.sign({id: user.id}, process.env.JWT_PASS ?? "defaultSecret", {expiresIn: "8h"})
+    return {user, token}
+  }
+
   async uploadProfilePicture(
     userId: number,
     file: Express.Multer.File
   ): Promise<IUser> {
     const user = await this.userRepository.findById(userId);
 
+
     if (!user) {
       throw new AppError("User not found", 404);
     }
 
+    const userUpdate:IUserUpdate = {
+      id:userId,
+      name: user.name,
+      email: user.email,
+      profileUrl: user.profileUrl
+    }
+
     // Delete old profile picture if exists
-    if (user.profileUrl && user.profileUrl.startsWith("/uploads/")) {
-      const oldProfilePath = path.join(__dirname, "..", "..", user.profileUrl);
+    if (userUpdate.profileUrl && userUpdate.profileUrl.startsWith("/uploads/")) {
+      const oldProfilePath = path.join(__dirname, "..", "..", userUpdate.profileUrl);
       if (fs.existsSync(oldProfilePath)) {
         fs.unlinkSync(oldProfilePath);
       }
     }
 
     // Update user with new profile picture URL
-    const updatedUser = await this.userRepository.update(userId, {
-      ...user,
+    const updatedUser = await this.userRepository.update({
+      ...userUpdate,
       profileUrl: `/uploads/${file.filename}`,
     });
 
@@ -124,7 +159,7 @@ export class UserService {
 
   async updateUser(
     id: number,
-    data: IRequestUser,
+    data: IRequestUserUpdate,
     profileImage?: Express.Multer.File
   ): Promise<IUser> {
     const user = await this.userRepository.findById(id);
@@ -133,12 +168,9 @@ export class UserService {
       throw new AppError("User not found", 404);
     }
 
-    this.validateUpdateUserData(data);
-
     // Handle profile image if provided
     let profileUrl = data.profileUrl;
     if (profileImage) {
-      console.log("AQUI", user);
 
       // Delete old profile image if exists
       if (user.profileUrl && user.profileUrl.startsWith("/uploads/")) {
@@ -155,14 +187,15 @@ export class UserService {
       profileUrl = `/uploads/${profileImage.filename}`;
     }
 
-    const userData: IUser = {
+    const userData: IUserUpdate = {
+      id,
       name: data.name,
       email: data.email,
       password: data.password,
-      profileUrl: profileUrl,
+      profileUrl: profileUrl
     };
 
-    return await this.userRepository.update(id, userData);
+    return await this.userRepository.update(userData);
   }
 
   async deleteUser(id: number): Promise<void> {
