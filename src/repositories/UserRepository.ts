@@ -45,6 +45,7 @@ export class UserRepository implements IUserRepository {
     user.password = data.password;
     user["shouldHash"] = true;
   }
+  
   if (data.profileUrl !== undefined) user.profileUrl = data.profileUrl;
 
   await this.repository.save(user);

@@ -1,3 +1,5 @@
+import getProfile from "./user-script/getProfile.js";
+
 const overlayMenu = document.getElementById("overlay-menu");
 const overlayBusca = document.getElementById("overlay");
 const configModal = document.getElementById("config-modal");
@@ -75,7 +77,7 @@ document.querySelectorAll("#overlay-menu a").forEach((link) => {
 // === Excluir conta com confirmação ===
 function excluirConta() {
   showConfirm("Tem certeza que deseja excluir sua conta?", async () => {
-    const userId = localStorage.getItem("userId");
+    const userId = await getProfile()
 
     if (!userId) {
       showAlert("Usuário não encontrado.", "danger");
@@ -83,8 +85,11 @@ function excluirConta() {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/users/${userId}`, {
+      const response = await fetch(`http://localhost:3000/users`, {
         method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
       });
 
       if (!response.ok) {
@@ -105,13 +110,23 @@ function excluirConta() {
   });
 }
 
+const btnExcluir = document.getElementById("btnDelete")
+btnExcluir.addEventListener( ("click"), () => {
+  excluirConta()
+})
+
 // === Sair com confirmação ===
 function sair() {
   showConfirm("Tem certeza que deseja sair da sua conta?", () => {
-    localStorage.removeItem("userId");
+    localStorage.removeItem("token");
     window.location.href = "cadastro_login.html";
   });
 }
+
+const btnSair = document.getElementById("red-menu")
+btnSair.addEventListener(("click"), () =>{
+  sair()
+})
 
 // === Busca de cursos ===
 document.getElementById("form-search").addEventListener("submit", async (e) => {

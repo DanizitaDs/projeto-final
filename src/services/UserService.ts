@@ -123,7 +123,8 @@ export class UserService {
       id:userId,
       name: user.name,
       email: user.email,
-      profileUrl: user.profileUrl
+      profileUrl: user.profileUrl,
+      password: undefined
     }
 
     // Delete old profile picture if exists

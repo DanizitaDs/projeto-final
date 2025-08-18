@@ -13,11 +13,11 @@ const userController = new UserController();
 const reactionController = new ReactionController();
 
 routes.get("/profile", authMiddleware ,userController.getProfile) // Logged in user
+routes.delete("/users", authMiddleware, userController.delete);
 routes.put("/users", authMiddleware, upload.single("profileImage"), userController.update); // Add upload middleware
 routes.get("/users", userController.findAll);
 routes.post("/users", upload.single("profileImage"), userController.create); // Add upload middleware
 routes.get("/users/:id", userController.findById);
-routes.delete("/users/:id", userController.delete);
 routes.post("/usersLogin", userController.login);
 
 // Rotas relacionadas a role dos users

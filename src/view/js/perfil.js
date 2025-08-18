@@ -1,4 +1,5 @@
 import getProfile from "./user-script/getProfile.js";
+import updateUserWithFile from "./user-script/updateUserWithFile.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const user = await getProfile()
@@ -103,20 +104,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       progressBar.style.display = "block";
       progressFill.style.width = "0%";
 
-      const formData = new FormData();
-      formData.append("name", document.getElementById("name").value);
-      formData.append("email", document.getElementById("email").value);
+      const formData = {
+        
+      };
+      formData.name = document.getElementById("name").value;
+      formData.email = document.getElementById("email").value
 
       const password = document.getElementById("password").value;
-      if (password) {
-        formData.append("password", password);
+      if (password && password.trim != "") {
+        formData.password = password;
       } else {
-        formData.append("password", userData.password);
+        formData.password = undefined;
       }
 
       const file = fileInput.files[0];
       if (file) {
-        formData.append("profileImage", file);
+        formData.profileFile = file;
       }
 
       let progress = 0;
@@ -127,22 +130,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       }, 200);
 
-      const response = await fetch(`http://localhost:3000/users`, {
-        method: "PUT",
-        body: formData,
-        headers:{"Authorization": `Bearer ${localStorage.getItem("token")}`}
-      });
+      // throw new Error(`name: ${formData.name}, email: ${formData.email}, password: ${formData.password}, profileImage: ${formData.profileUrl}`);
+
+      await updateUserWithFile(formData.name, formData.email, formData.password, formData.profileFile)
+
 
       clearInterval(progressInterval);
       progressFill.style.width = "100%";
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Erro ao atualizar perfil");
-      }
-
-      const updatedUser = await response.json();
-      userData = updatedUser;
+      userData = await getProfile();
       localStorage.setItem("profileUrl", userData.profileUrl);
 
       document.getElementById("user-name-display").textContent = userData.name;

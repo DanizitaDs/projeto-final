@@ -114,7 +114,7 @@ export class UserController {
   // Deletar usuário
   async delete(req: Request, res: Response): Promise<Response> {
     try {
-      const { id } = req.params;
+      const { id } = req.user;
       await userService.deleteUser(Number(id));
       return res.status(204).send();
     } catch (error: any) {
@@ -127,15 +127,19 @@ export class UserController {
   // Adicionar método para upload de foto de perfil
   async uploadProfilePicture(req: Request, res: Response): Promise<Response> {
     try {
-      const { id } = req.params;
+      const user = req.user
       const profileImage = req.file;
 
       if (!profileImage) {
         throw new AppError("Nenhuma imagem foi enviada", 400);
       }
 
-      const user = await userService.uploadProfilePicture(
-        Number(id),
+      if(!user.id){
+        throw new AppError("Id not ruturned", 500)
+      }
+
+      const newUser = await userService.uploadProfilePicture(
+        user.id,
         profileImage
       );
       return res.json(user);
