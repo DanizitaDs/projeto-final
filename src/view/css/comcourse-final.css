@@ -77,6 +77,11 @@ body {
   --bs-btn-disabled-border-color: #5992ff;
 }
 
+.btn-outline-success {
+  --bs-btn-color: #1ccd86;
+  --bs-btn-border-color: #0e0bbf;
+}
+
 .btn-cursos:active {
   color: #ffffff;
   background-color: #000000;
@@ -2471,4 +2476,12 @@ textarea {
 }
 .btn-success:hover {
   background-color: #1565c0;
+}
+.btn-like.active {
+  background-color: #198754 !important; /* verde Bootstrap */
+  color: white !important;
+}
+.btn-dislike.active {
+  background-color: #dc3545 !important;
+  color: white !important;
 }

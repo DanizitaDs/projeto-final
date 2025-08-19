@@ -8,12 +8,12 @@ const configModal = document.getElementById("config-modal");
 const user = await getProfile()
 
 if (user.role === "student") {
-    const btns = ["btnEditar", "btnCriarCurso", "btnCriarAula"];
-    btns.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = "none";
-    });
-  }
+  const btns = ["btnEditar", "btnCriarCurso", "btnCriarAula"];
+  btns.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
+}
 
 // === Configura imagem de perfil ===
 async function loadProfileImg () {
@@ -27,7 +27,6 @@ async function loadProfileImg () {
   const profileUrl = user.profileUrl;
 
   try {
-
     if (profileUrl && profileUrl !== "null" && profileUrl.trim() !== "") {
       const imgElement = document.createElement("img");
       imgElement.classList.add("foto-perfil");
@@ -81,7 +80,6 @@ document.addEventListener("click", (e) => {
   }
 });
 
-
 // === Fechar menu ao clicar em links ===
 document.querySelectorAll("#overlay-menu a").forEach((link) => {
   link.addEventListener("click", () => {
@@ -126,7 +124,7 @@ function excluirConta() {
 }
 
 const btnExcluir = document.getElementById("btnDelete")
-btnExcluir.addEventListener( ("click"), () => {
+btnExcluir.addEventListener(("click"), () => {
   excluirConta()
 })
 
@@ -247,4 +245,71 @@ function showConfirm(message, onConfirm) {
   });
 
   confirmModal.show();
+}
+
+/* ============================================================
+   LIKE / DISLIKE (exclusivos e com contagem)
+============================================================ */
+async function toggleReaction(userId, classId, reaction) {
+  await fetch("http://localhost:3000/reactions", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, classId, reaction })
+  });
+}
+
+async function updateReactionCounts() {
+  const response = await fetch("http://localhost:3000/reactions");
+  const reactions = await response.json();
+
+  document.querySelectorAll(".course-card").forEach(card => {
+    const classId = card.querySelector(".like-btn").dataset.classeId;
+    const likes = reactions.filter(r => r.classId == classId && r.reaction === "like").length;
+    const dislikes = reactions.filter(r => r.classId == classId && r.reaction === "dislike").length;
+
+    card.querySelector(".like-count").textContent = likes;
+    card.querySelector(".dislike-count").textContent = dislikes;
+  });
+}
+
+function setupReactions(userId) {
+  document.querySelectorAll(".like-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.classeId;
+      await toggleReaction(userId, id, "like");
+
+      btn.classList.toggle("fas");
+      btn.classList.toggle("far");
+
+      // Se clicou em like, tira dislike
+      const dislikeBtn = btn.closest(".course-card").querySelector(".dislike-btn");
+      dislikeBtn.classList.remove("fas");
+      dislikeBtn.classList.add("far");
+
+      updateReactionCounts();
+    });
+  });
+
+  document.querySelectorAll(".dislike-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.classeId;
+      await toggleReaction(userId, id, "dislike");
+
+      btn.classList.toggle("fas");
+      btn.classList.toggle("far");
+
+      // Se clicou em dislike, tira like
+      const likeBtn = btn.closest(".course-card").querySelector(".like-btn");
+      likeBtn.classList.remove("fas");
+      likeBtn.classList.add("far");
+
+      updateReactionCounts();
+    });
+  });
+}
+
+// Chama quando carregar cursos (usa user.id já do getProfile)
+if (user) {
+  setupReactions(user.id);
+  updateReactionCounts();
 }
