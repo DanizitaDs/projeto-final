@@ -4,17 +4,29 @@ const overlayMenu = document.getElementById("overlay-menu");
 const overlayBusca = document.getElementById("overlay");
 const configModal = document.getElementById("config-modal");
 
+// === Regras do menu ===
+const user = await getProfile()
+
+if (user.role === "student") {
+    const btns = ["btnEditar", "btnCriarCurso", "btnCriarAula"];
+    btns.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = "none";
+    });
+  }
+
 // === Configura imagem de perfil ===
-document.addEventListener("DOMContentLoaded", function () {
+async function loadProfileImg () {
   const profileBolinhaElement = document.querySelector(".perfil-bolinha");
 
   if (!profileBolinhaElement) {
     console.error("No .perfil-bolinha element found on page");
     return;
   }
+  
+  const profileUrl = user.profileUrl;
 
   try {
-    const profileUrl = localStorage.getItem("profileUrl");
 
     if (profileUrl && profileUrl !== "null" && profileUrl.trim() !== "") {
       const imgElement = document.createElement("img");
@@ -37,7 +49,9 @@ document.addEventListener("DOMContentLoaded", function () {
     console.error("Erro ao configurar imagem de perfil:", error);
     profileBolinhaElement.innerHTML = '<i class="fas fa-user"></i>';
   }
-});
+}
+
+loadProfileImg();
 
 // === Abrir overlay do menu ===
 document.querySelector(".perfil-bolinha").addEventListener("click", () => {
@@ -66,6 +80,7 @@ document.addEventListener("click", (e) => {
     overlayBusca.classList.remove("show");
   }
 });
+
 
 // === Fechar menu ao clicar em links ===
 document.querySelectorAll("#overlay-menu a").forEach((link) => {
@@ -123,7 +138,7 @@ function sair() {
   });
 }
 
-const btnSair = document.getElementById("red-menu")
+const btnSair = document.getElementById("btnSair")
 btnSair.addEventListener(("click"), () =>{
   sair()
 })

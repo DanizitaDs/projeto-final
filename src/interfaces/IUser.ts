@@ -9,6 +9,7 @@ export interface IUser {
   name: string;
   email: string;
   password: string;
+  role: tUserRole
   profileUrl?: string;
   //createdCourses?: ICourse[];
   reactions?: IReaction[];
@@ -52,11 +53,15 @@ export interface IUserWithToken{
   token: string
 }
 
+export type tUserRole = "student" | "teacher" | "admin"
+
 export interface IUserRepository {
   create(data: IUser): Promise<IUser>;
   findById(id: number): Promise<IUser | null>;
   update(data: IUserUpdate): Promise<IUser>;
   delete(id: number): Promise<void>;
+  updateRole(user:IUser, newRole:tUserRole): Promise<void>
+  adminPreset():Promise<void>
   //getReactions()            |
   //getReactionById()         |
   //getAllCreatedCourses()    |

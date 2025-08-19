@@ -1,4 +1,4 @@
-import { IUser, IRequestUser, IUserWithToken, IUserUpdate, IRequestUserUpdate } from "../interfaces/IUser";
+import { IUser, IRequestUser, IUserWithToken, IUserUpdate, IRequestUserUpdate, tUserRole } from "../interfaces/IUser";
 import { UserRepository } from "../repositories/UserRepository";
 import { AppError } from "../utils/AppError";
 import multer from "multer";
@@ -82,6 +82,7 @@ export class UserService {
       profileUrl: profileImage
         ? `/uploads/${profileImage.filename}`
         : data.profileUrl,
+      role:"student",
     };
     return await this.userRepository.create(userData);
   }
@@ -215,6 +216,24 @@ export class UserService {
     }
 
     await this.userRepository.delete(id);
+  }
+
+  async updateRole(
+    userAdmin:IUser,
+    userIdToBeUpdated:number,
+    newRole: tUserRole
+  ):Promise<void>{
+    if(userAdmin.role != "admin"){
+      throw new AppError("User not is admin", 403)
+    }
+
+    const user = await this.userRepository.findById(userIdToBeUpdated)
+
+    if(!user){
+      throw new AppError("User not found", 404)
+    }
+
+    this.userRepository.updateRole(user, newRole)
   }
 
   /**

@@ -412,7 +412,7 @@ hr {
   transition: background-color 0.2s;
 }
 
-#red-menu {
+#btnSair {
   background-color: #d9d9d9;
   color: red;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -1522,7 +1522,7 @@ hr {
   background-color: #c0c0c0;
 }
 
-#red-menu {
+#btnSair {
   background-color: #d9d9d9;
   color: red;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);

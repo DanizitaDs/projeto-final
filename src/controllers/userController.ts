@@ -5,10 +5,9 @@ import { UserService } from "../services/UserService";
 import { IRequestUser, IRequestUserUpdate } from "../interfaces/IUser";
 import { AppError } from "../utils/AppError";
 import jwt from "jsonwebtoken";
+import { UserRepository } from "../repositories/UserRepository";
 
-
-
-const userRepository = AppDataSource.getRepository(User);
+const userRepository = new UserRepository()
 const userService = new UserService();
 
 export class UserController {
@@ -148,5 +147,17 @@ export class UserController {
         .status(error.statusCode || 500)
         .json({ message: error.message });
     }
+  }
+
+  async updateRole(req:Request, res:Response): Promise<Response>{
+    const userAdmin = req.user;
+    const { newRole, userIdToBeUpdated } = req.body;
+    await userService.updateRole(userAdmin, userIdToBeUpdated, newRole)
+    return res.status(201)
+  }
+
+  async userAdminPreset(req:Request, res:Response):Promise<Response>{
+    await userRepository.adminPreset()
+    return res.json({mensage: "admin user has been pre-set"})
   }
 }

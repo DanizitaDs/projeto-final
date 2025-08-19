@@ -1,11 +1,11 @@
 meta {
-  name: getProfile
+  name: updateRole
   type: http
-  seq: 6
+  seq: 7
 }
 
-get {
-  url: http://localhost:3000/profile
+patch {
+  url: http://localhost:3000/users/updateRole
   body: none
   auth: bearer
 }

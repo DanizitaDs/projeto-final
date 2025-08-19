@@ -12,7 +12,9 @@ const classesController = new ClassesController(); // Cria uma instância do con
 const userController = new UserController();
 const reactionController = new ReactionController();
 
-routes.get("/profile", authMiddleware ,userController.getProfile) // Logged in user
+
+// === User ===
+routes.get("/profile", authMiddleware ,userController.getProfile); // Logged in user
 routes.delete("/users", authMiddleware, userController.delete);
 routes.put("/users", authMiddleware, upload.single("profileImage"), userController.update); // Add upload middleware
 routes.get("/users", userController.findAll);
@@ -20,8 +22,9 @@ routes.post("/users", upload.single("profileImage"), userController.create); // 
 routes.get("/users/:id", userController.findById);
 routes.post("/usersLogin", userController.login);
 
-// Rotas relacionadas a role dos users
-// routes.post("/users/updateRole/:id", userController.updateRole); // Atualiza a role do usuário
+// === User roles ===
+routes.patch("/users/updateRole", authMiddleware, userController.updateRole);
+routes.post("/adminPreset", userController.userAdminPreset) // Users admin preset
 
 // Rotas para cursos
 routes.post("/cursos", (req, res) => courseController.create(req, res));
