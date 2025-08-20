@@ -8,7 +8,7 @@ const configModal = document.getElementById("config-modal");
 const user = await getProfile()
 
 if (user.role === "student") {
-  const btns = ["btnEditar", "btnCriarCurso", "btnCriarAula"];
+  const btns = ["btnEditar", "btnCriarCurso", "btnCriarAula", "btnAdmin"];
   btns.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";

@@ -20,7 +20,10 @@ export class CourseRepository implements ICourseRepository {
   async findById(id: number): Promise<ICourse | null> {
     return await this.repository.findOne({
       where: { id },
-      relations: ["classes"],
+      relations: {
+        classes: true,
+        reactions: true
+      }
     });
   }
 

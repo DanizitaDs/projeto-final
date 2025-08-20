@@ -13,7 +13,6 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
   />
   <link rel="stylesheet" href="css/comcourse-final.css" />
-  <link rel="stylesheet" href="css/course-detail.css" />
 </head>
 
 <body>
@@ -78,7 +77,7 @@
       <div id="btnSuporte" class="overlay-button-menu">
         <a href="https://mailto:comcoursetds@gmail.com" target="_blank" class="text-decoration-none text-white"><i class="fas fa-headphones"></i> Suporte </a>
       </div>
-      <div id="btnSuporte" class="overlay-button-menu"><a href="telaAdmin.html" target="_blank" class="text-decoration-none text-white"><i class="fa fa-tasks"></i> Painel Administrativo </a></div>
+      <div id="btnAdmin" class="overlay-button-menu"><a href="telaAdmin.html" target="_blank" class="text-decoration-none text-white"><i class="fa fa-tasks"></i> Painel Administrativo </a></div>
       <div id="btnDelete" class="overlay-button-menu text-white"><i class="fas fa-cog"></i> Excluir Conta</div>
       <div id="btnSair" class="overlay-button text-red"><i class="fa fa-sign-out"></i> Sair</div>
     </div>
@@ -112,213 +111,11 @@
     </div>
   </div>
 
-  <!-- SCRIPT PRINCIPAL -->
-  <script type="module">
-    import getProfile from "./js/user-script/getProfile.js";
-
-    let currentUser = null;
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      currentUser = await getProfile();
-      if (!currentUser) {
-        showAlert("Você precisa estar logado para acessar esta página.", "danger");
-        window.location.href = "cadastro_login.html";
-        return;
-      }
-      loadCourseDetails();
-    });
-
-    async function loadCourseDetails() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const courseId = urlParams.get("id");
-
-      if (!courseId) {
-        document.querySelector(".course-info").innerHTML =
-          "<p>Curso não encontrado.</p>";
-        return;
-      }
-
-      try {
-        const response = await fetch(`http://localhost:3000/cursos/${courseId}`);
-        const course = await response.json();
-
-        // HERO
-        const courseHero = document.querySelector(".course-hero");
-        courseHero.innerHTML = `
-          <img src="${course.imageUrl}" alt="Imagem do Curso" class="img-fluid course-hero-image">
-        `;
-
-        // INFO (Título + descrição + reações do curso)
-        const courseInfo = document.querySelector(".course-info");
-        courseInfo.innerHTML = `
-          <h1 class="course-title">${course.title}</h1>
-          <p class="course-desc">${course.description}</p>
-          <div class="interaction-bar mt-2 d-flex gap-4 flex-wrap">
-            <div class="like-counter d-flex align-items-center gap-1">
-              <i class="far fa-thumbs-up reaction-icon btn-like" data-course-id="${course.id}" data-classes-id="null"></i>
-              <span class="like-count">0</span>
-            </div>
-            <div class="dislike-counter d-flex align-items-center gap-1">
-              <i class="far fa-thumbs-down reaction-icon btn-dislike" data-course-id="${course.id}" data-classes-id="null"></i>
-              <span class="dislike-count">0</span>
-            </div>
-          </div>
-        `;
-
-        // LISTA DE AULAS
-        const lessonsContainer = document.getElementById("lessons-container");
-        lessonsContainer.innerHTML = "";
-
-        for (const classItem of course.classes) {
-          const lessonCard = `
-            <div class="course-card bg-white p-3 rounded shadow-sm d-flex gap-3">
-              <img src="${course.imageUrl}" alt="Imagem do curso" class="rounded" 
-                style="width: 100px; height: 100px; object-fit: cover;">
-              <div class="flex-grow-1">
-                <h5 class="mb-1">${classItem.title}</h5>
-                <p class="small text-muted">${classItem.description}</p>
-                <a href="${classItem.url}" class="btn btn-outline-primary btn-sm" target="_blank">Ver Aula</a>
-                <div class="mt-2 d-flex align-items-center gap-3">
-                  <div class="like-counter d-flex align-items-center gap-1">
-                    <i class="far fa-thumbs-up reaction-icon btn-like" data-classes-id="${classItem.id}" ></i>
-                    <span class="like-count">0</span>
-                  </div>
-                  <div class="dislike-counter d-flex align-items-center gap-1">
-                    <i class="far fa-thumbs-down reaction-icon btn-dislike" data-classes-id="${classItem.id}"></i>
-                    <span class="dislike-count">0</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-          lessonsContainer.innerHTML += lessonCard;
-        }
-
-        // Eventos de clique
-        setupReactionButtons();
-        refreshReactions();
-      } catch (error) {
-        console.error("Error loading course details:", error);
-        document.querySelector(".course-info").innerHTML =
-          "<p>Erro ao carregar os detalhes do curso.</p>";
-      }
-    }
-
-    function setupReactionButtons() {
-      document.querySelectorAll(".btn-like").forEach(icon => {
-        icon.addEventListener("click", async () => {
-          const classesId = icon.dataset.classesId !== "null" ? icon.dataset.classesId : null;
-          await toggleReaction(undefined, classesId, "like");
-          refreshReactions();
-        });
-      });
-
-      document.querySelectorAll(".btn-dislike").forEach(icon => {
-        icon.addEventListener("click", async () => {
-          const courseId = icon.dataset.courseId;
-          const classesId = icon.dataset.classesId !== "null" ? icon.dataset.classesId : null;
-          await toggleReaction(undefined, classesId, "dislike");
-          refreshReactions();
-        });
-      });
-    }
-
-    async function toggleReaction(courseId, classesId, reaction) {
-      try {
-        if(!courseId && !classesId){
-          throw Error("Erro na reação")
-        }
-        await fetch("http://localhost:3000/reactions", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: currentUser.id,
-            courseId: courseId? Number(courseId) : null,
-            classesId: classesId ? Number(classesId) : null,
-            reaction
-          })
-        });
-      } catch (err) {
-        console.error("Erro ao registrar reação:", err);
-      }
-    }
-
-    async function refreshReactions() {
-      try {
-        const response = await fetch("http://localhost:3000/reactions");
-        const reactions = await response.json();
-
-        document.querySelectorAll(".reaction-icon").forEach(icon => {
-          const courseId = Number(icon.dataset.courseId);
-          const classesId = icon.dataset.classesId !== "null" ? Number(icon.dataset.classesId) : null;
-
-          const likeCountEl = icon.closest(".like-counter")?.querySelector(".like-count");
-          const dislikeCountEl = icon.closest(".dislike-counter")?.querySelector(".dislike-count");
-
-          const likes = reactions.filter(r =>
-            r.courseId === courseId &&
-            (classesId ? r.classesId === classesId : r.classesId == null) &&
-            r.reaction === "like"
-          ).length;
-
-          const dislikes = reactions.filter(r =>
-            r.courseId === courseId &&
-            (classesId ? r.classesId === classesId : r.classesId == null) &&
-            r.reaction === "dislike"
-          ).length;
-
-          if (likeCountEl) likeCountEl.textContent = likes;
-          if (dislikeCountEl) dislikeCountEl.textContent = dislikes;
-
-          // Reset icones
-          icon.classList.remove("fas");
-          icon.classList.add("far");
-
-          // Reação do usuário
-          const userReaction = reactions.find(r =>
-            r.courseId === courseId &&
-            (classesId ? r.classesId === classesId : r.classesId == null) &&
-            r.userId === currentUser.id
-          );
-
-          if (userReaction) {
-            if (userReaction.reaction === "like" && icon.classList.contains("btn-like")) {
-              icon.classList.remove("far");
-              icon.classList.add("fas");
-            }
-            if (userReaction.reaction === "dislike" && icon.classList.contains("btn-dislike")) {
-              icon.classList.remove("far");
-              icon.classList.add("fas");
-            }
-          }
-        });
-      } catch (err) {
-        console.error("Erro ao atualizar contadores:", err);
-      }
-    }
-
-    // Alerta bootstrap
-    function showAlert(message, type = "success", timeout = 3000) {
-      const alertContainer = document.getElementById("alert-container");
-      if (!alertContainer) return;
-      const wrapper = document.createElement("div");
-      wrapper.innerHTML = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-          ${message}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-        </div>
-      `;
-      const alertElement = wrapper.firstElementChild;
-      alertContainer.appendChild(alertElement);
-      setTimeout(() => {
-        const alertInstance = bootstrap.Alert.getOrCreateInstance(alertElement);
-        alertInstance.close();
-      }, timeout);
-    }
-  </script>
   
   <!-- JS Overlay + Bootstrap -->
   <script type="module" src="./js/overlay.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- SCRIPT PRINCIPAL -->
+  <script type="module" src="./js/detalhes_curso.js"></script>
 </body>
 </html>

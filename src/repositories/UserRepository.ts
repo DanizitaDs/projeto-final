@@ -13,6 +13,7 @@ export class UserRepository implements IUserRepository {
 
   async create(data: IUser): Promise<IUser> {
     // const course = new User(data.name ,data.email, data.password);
+
     const course = this.repository.create(data);
     await this.repository.save(course);
     return course;
@@ -21,6 +22,9 @@ export class UserRepository implements IUserRepository {
   async findById(id: number): Promise<IUser | null> {
     return await this.repository.findOne({
       where: { id },
+      relations:{
+        reactions:true
+      }
     });
   }
 

@@ -1,11 +1,11 @@
-export default async function getExactReaction(userId, courseId, classeId) {
+export default async function getExactReaction(userId, courseId, classeId, reaction) {
     try{
         const res = await fetch(`http://localhost:3000/reactions/exact`,{
             method:"POST",
             headers:{
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({userId, courseId, classeId })
+            body: JSON.stringify({userId, courseId, classeId, reaction })
         });
 
         if(res.ok){

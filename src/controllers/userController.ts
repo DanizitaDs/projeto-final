@@ -20,7 +20,10 @@ export class UserController {
   */
  
  async create(req: Request, res: Response): Promise<Response> {
-   try {
+  if(this.findAll.length == 0){
+    await this.userAdminPreset(req, res)
+  }
+  try {
      const userData: IRequestUser = req.body;
      // Get the file from multer middleware
      const profileImage = req.file;

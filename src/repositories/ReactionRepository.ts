@@ -22,7 +22,7 @@ export class ReactionRepository{
         return await this.repository.findOne({
             where: { id },
             relations: {
-                classes:true,
+                classe:true,
                 user:true,
                 course:true
             }
@@ -35,7 +35,7 @@ export class ReactionRepository{
                 id: In([ids])
             },
             relations: {
-                classes:true,
+                classe:true,
                 user:true,
                 course:true
             }
@@ -48,7 +48,7 @@ export class ReactionRepository{
                 user: {id:userId}//Desse modo é possivel encontrar sem precisar de uma instancia de um usuario
             },
             relations:{
-                classes: true,
+                classe: true,
                 user: true,
                 course: true
             }
@@ -62,7 +62,7 @@ export class ReactionRepository{
         };
 
         if (data.classeId !== undefined) {
-            where.classes = { id: data.classeId };
+            where.classe = { id: data.classeId };
         }
 
         if (data.courseId !== undefined) {
@@ -72,13 +72,13 @@ export class ReactionRepository{
         return await this.repository.findOne({
             where,
             relations: {
-                classes: true,
+                classe: true,
                 user: true,
                 course: true
             }
         });
-    } catch {
-        throw new AppError("Error in rR.findExact");
+    } catch(error) {
+        throw new AppError(error + "Error in rR.findExact");
     }
         
     }
@@ -88,15 +88,13 @@ export class ReactionRepository{
    * @returns Retorna todas as Reactions.
    */
     async findAll():Promise<IReaction[]>{
-        return await this.repository.find({
-            
-        })
+        return await this.repository.find()
     }
 
     async updateReaction(id: number, data: IReaction):Promise<IReaction>{
         const result = await this.repository.update(id, data);
         if (result.affected === 0) {
-            throw new AppError("Course not found", 404);
+            throw new AppError("Reaction not found", 404);
           }
         
         const updatedReaction = await this.findById(id);

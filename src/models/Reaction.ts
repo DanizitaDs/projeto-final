@@ -37,9 +37,9 @@ export class Reaction{
     courseId?:number
 
     @ManyToOne(() => Classes, (classes) => classes.reactions, { nullable:true,onDelete: 'CASCADE' })
-    classes?:IClasses;
+    classe?:IClasses;
 
-    @Column({type: "number", nullable: true})
+    @Column({type: "int", nullable: true})
     classesId?:number
 
     constructor(user:User, reacao:"like" | "dislike"){

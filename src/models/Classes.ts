@@ -27,7 +27,7 @@ export class Classes implements IClasses {
   @ManyToOne(() => Course, (course) => course.classes)
   course: ICourse; // Relacionamento com cursos
 
-  @OneToMany(() => Reaction, (reaction:Reaction) => reaction.classes )
+  @OneToMany(() => Reaction, (reaction:Reaction) => reaction.classe )
   reactions:Reaction[];
 
   // @Column({type:"date", nullable:false})

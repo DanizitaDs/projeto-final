@@ -46,7 +46,7 @@ export class ReactionService {
       reactionsFound?.forEach((reaction)=>{
         if(reaction.course?.id && reaction.course?.id == course?.id){
           validatedReaction = false;
-        } else if(reaction.classes?.id && reaction.classes?.id == classe?.id){
+        } else if(reaction.classe?.id && reaction.classe?.id == classe?.id){
           validatedReaction = false;
         }
       })
@@ -92,6 +92,7 @@ export class ReactionService {
     const {user, course, classe} = await this.validateReactionData(data, errorLocation);
     const reactionFinded = await this.getExactReaction(data);
     
+
     if(!reactionFinded){
       const reactionData:IReaction = {
         user: user,
@@ -135,7 +136,7 @@ export class ReactionService {
     }
 
     if (!(data.courseId || data.classeId)) {
-      throw new AppError("Either courseId or classId is required", 400);
+      throw new AppError("Either courseId or classeId is required", 400);
     }
     
     //Variaveis que serão retornadas
@@ -151,12 +152,12 @@ export class ReactionService {
     //Verificando se existe uma classeId ou um courseId na reaction e se tal existe no banco de dados
     if (data.classeId) {
         classe = await this.classRepository.findById(data.classeId);
-        if(!classe){
+        if(classe == null){
             throw new AppError(`${errorLocation} classe not found. classeId: ${data.classeId}`)
         }
     } else if(data.courseId){
         course = await this.courseRepository.findById(data.courseId)
-        if(!course){
+        if(course == null){
             throw new AppError(`${errorLocation} course not found. courseId: ${data.courseId}`)
         }
     } else{

@@ -1,0 +1,15 @@
+meta {
+  name: toggle reaction
+  type: http
+  seq: 8
+}
+
+put {
+  url: http://localhost:3000/reactions
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}
