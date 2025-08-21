@@ -151,7 +151,7 @@ async function refreshReactions() {
             const dislikeCountEl = icon.closest(".dislike-counter")?.querySelector(".dislike-count");
 
             let likes, dislikes;
-            console.log(reactions)
+
             if(courseId){
                 likes = reactions.filter(r =>
                     (courseId ? r.courseId === courseId : r.courseId == null) &&
@@ -165,12 +165,12 @@ async function refreshReactions() {
 
             } else if(classesId){
                 likes = reactions.filter(r =>
-                    (classesId ? r.classeId === classesId : r.classeId == null) &&
+                    (classesId ? r.classesId === classesId : r.classesId == null) &&
                     r.reaction === "like"
                 ).length;
     
                 dislikes = reactions.filter(r =>
-                    (classesId ? r.classeId === classesId : r.classeId == null) &&
+                    (classesId ? r.classesId === classesId : r.classesId == null) &&
                     r.reaction === "dislike"
                 ).length;
     
@@ -182,29 +182,59 @@ async function refreshReactions() {
             if (likeCountEl) likeCountEl.textContent = likes;
             if (dislikeCountEl) dislikeCountEl.textContent = dislikes;
 
-            // Reset icones
-            icon.classList.remove("fas");
-            icon.classList.add("far");
 
-            // Reação do usuário
-            const userReaction = {
-                like: await getExactReaction(currentUser.id, courseId, classesId, "like"),
-                dislike: await getExactReaction(currentUser.id, courseId, classesId, "dislike"),
+            let userReaction;
+
+            if (icon.classList.contains("btn-like")) {
+                userReaction = await getExactReaction(currentUser.id, courseId, classesId, "like");
+                if(userReaction){
+                    icon.classList.remove("far"); // oco
+                    icon.classList.add("fas");    // cheio
+                }
             }
 
-                if (userReaction.like && icon.classList.contains("btn-like")) {
+            if (icon.classList.contains("btn-dislike")) {
+                userReaction = await getExactReaction(currentUser.id, courseId, classesId, "dislike");
+                if(userReaction){
                     icon.classList.remove("far");
                     icon.classList.add("fas");
                 }
-                if (userReaction.dislike != null && icon.classList.contains("btn-dislike")) {
-                    icon.classList.remove("far");
-                    icon.classList.add("fas");
-                }
+            }
+
         };
     } catch (err) {
         console.error("Erro ao atualizar contadores:", err);
     }
 }
+
+//
+async function updateReactionIcons(local) {
+    const likeBtn = local.querySelector(".btn-like");
+    const dislikeBtn = local.querySelector(".btn-dislike");
+
+    
+
+    if (!reaction) {
+        likeBtn.classList.add("far");
+        likeBtn.classList.remove("fas");
+        dislikeBtn.classList.add("far");
+        dislikeBtn.classList.remove("fas");
+    } else if (reaction.reaction === "like") {
+        likeBtn.classList.add("fas");
+        likeBtn.classList.remove("far");
+        dislikeBtn.classList.add("far");
+        dislikeBtn.classList.remove("fas");
+    } else if (reaction.reaction === "dislike") {
+        likeBtn.classList.add("far");
+        likeBtn.classList.remove("fas");
+        dislikeBtn.classList.add("fas");
+        dislikeBtn.classList.remove("far");
+    }
+}
+
+
+
+
 
 // Alerta bootstrap
 function showAlert(message, type = "success", timeout = 3000) {

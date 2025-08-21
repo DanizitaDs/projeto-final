@@ -31,12 +31,12 @@ export class ReactionController {
   }
 
   async findExact(request: Request, response: Response): Promise<Response> {
-    let { userId, courseId, classeId} = request.body;
+    let { userId, courseId, classesId} = request.body;
 
     const data: IRequestReaction = { 
         userId: userId? userId : undefined, 
         courseId: courseId? courseId : undefined, 
-        classeId: classeId? classeId : undefined,
+        classesId: classesId? classesId : undefined,
         reaction: "like"
     };
 

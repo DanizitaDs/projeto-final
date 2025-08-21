@@ -1,11 +1,11 @@
-export default async function toggleReaction(userId, courseId, classeId, reaction) {
+export default async function toggleReaction(userId, courseId, classesId, reaction) {
     try{
         const res = await fetch(`http://localhost:3000/reactions`,{
             method:"PUT",
             headers:{
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({userId, courseId, classeId, reaction })
+            body: JSON.stringify({userId, courseId, classesId, reaction })
         });
 
         if(res.ok){

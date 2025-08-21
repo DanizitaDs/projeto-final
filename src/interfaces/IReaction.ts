@@ -14,7 +14,7 @@ export interface IRequestReaction {
   id?: number;
   userId: number;
   courseId?: number; 
-  classeId?: number;
+  classesId?: number;
   reaction: "like" | "dislike"
 }
 

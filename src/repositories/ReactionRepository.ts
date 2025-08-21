@@ -3,6 +3,8 @@ import { Reaction } from "../models/Reaction";
 import { AppDataSource } from "../database/connection";
 import { IReaction, IRequestReaction } from "../interfaces/IReaction";
 import { AppError } from "../utils/AppError";
+import { Classes } from "../models/Classes";
+import { Course } from "../models/Course";
 
 
 export class ReactionRepository{
@@ -61,12 +63,12 @@ export class ReactionRepository{
             user: { id: data.userId }
         };
 
-        if (data.classeId !== undefined) {
-            where.classe = { id: data.classeId };
+        if (data.classesId !== undefined) {
+            where.classe = { id: data.classesId } as Classes;
         }
 
         if (data.courseId !== undefined) {
-            where.course = { id: data.courseId };
+            where.course = { id: data.courseId } as Course;
         }
 
         return await this.repository.findOne({

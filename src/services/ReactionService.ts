@@ -84,13 +84,18 @@ export class ReactionService {
   async getExactReaction(data: IRequestReaction): Promise<IReaction | null>{
     const errorLocation = "Error in ReactionService.getExactReaction."
     await this.validateReactionData(data, errorLocation);
-    return await this.reactionRepository.findExact(data);
+    const reactionFounded = await this.reactionRepository.findExact(data);
+    if(reactionFounded && reactionFounded.reaction != data.reaction){
+      return null
+    }
+    return reactionFounded
+
   }
 
   async toggleReaction(data: IRequestReaction): Promise<IReaction | null> {
     const errorLocation = "Error in ReactionService.updateReaction()."
     const {user, course, classe} = await this.validateReactionData(data, errorLocation);
-    const reactionFinded = await this.getExactReaction(data);
+    const reactionFinded = await this.reactionRepository.findExact(data);
     
 
     if(!reactionFinded){
@@ -100,8 +105,8 @@ export class ReactionService {
         classe: classe,
         reaction: data.reaction
       };
-      
       return await this.reactionRepository.create(reactionData)
+      
     }
 
     if(!reactionFinded.id){
@@ -135,8 +140,8 @@ export class ReactionService {
       throw new AppError("reaction is required", 400);
     }
 
-    if (!(data.courseId || data.classeId)) {
-      throw new AppError("Either courseId or classeId is required", 400);
+    if (!(data.courseId || data.classesId)) {
+      throw new AppError("Either courseId or classesId is required", 400);
     }
     
     //Variaveis que serão retornadas
@@ -149,11 +154,11 @@ export class ReactionService {
       throw new AppError(`${errorLocation} User not found. userId: ${data.userId}`, 404)
     }
 
-    //Verificando se existe uma classeId ou um courseId na reaction e se tal existe no banco de dados
-    if (data.classeId) {
-        classe = await this.classRepository.findById(data.classeId);
+    //Verificando se existe uma classesId ou um courseId na reaction e se tal existe no banco de dados
+    if (data.classesId) {
+        classe = await this.classRepository.findById(data.classesId);
         if(classe == null){
-            throw new AppError(`${errorLocation} classe not found. classeId: ${data.classeId}`)
+            throw new AppError(`${errorLocation} classe not found. classesId: ${data.classesId}`)
         }
     } else if(data.courseId){
         course = await this.courseRepository.findById(data.courseId)
