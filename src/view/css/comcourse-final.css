@@ -46,8 +46,6 @@ body {
   background-color: #5992ff !important;
 }
 
-
-
 .btn-cursos {
   background-color: white;
   color: #333;
@@ -153,17 +151,24 @@ body {
 }
 
 .user {
-  color: black;
+  color: #333;
   text-decoration: none;
+  padding: 5px 10px;
   margin-left: 10px;
   transition: all 0.3s ease;
+  border: 0.5px solid transparent;
+  border-radius: 5px;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: bold;
 }
 
 .user:active {
-  color: #ffffff;
-  background-color: #000000;
   padding: 5px 10px;
+  margin-left: 10px;
+  background-color: #ffffff;
   border-radius: 5px;
+  border: 0.5px solid black;
 }
 
 #meio {
@@ -1388,20 +1393,26 @@ hr {
 
 /* ---------- BOTÕES ---------- */
 .btn-cursos {
-  background-color: white;
+  background-color: transparent;
   color: #333;
   padding: 5px 10px;
-  border: 0.5px solid black;
+  border: 0.5px solid transparent;
   cursor: pointer;
   border-radius: 5px;
   text-decoration: none;
   display: inline-block;
   font-weight: bold;
+  transition: all 0.3s ease;
 }
 
 .btn-cursos:active {
-  color: #ffffff;
-  background-color: #000000;
+  color: #333;
+  background-color: #ffffff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: 0.5px solid black;
+  transition: all 0.3s ease;
+
 }
 
 .btn-secondary {

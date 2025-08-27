@@ -3,8 +3,6 @@ import getProfile from "./user-script/getProfile.js";
 import toggleReaction from "./reaction-script/toggleReaction.js"
 import getExactReaction from "./reaction-script/getExactReaction.js"
 
-" "
-
 let currentUser = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -147,6 +145,9 @@ async function refreshReactions() {
             const courseId = icon.dataset.courseId !== "null" ? Number(icon.dataset.courseId) : undefined;
             const classesId = icon.dataset.classesId !== "null" ? Number(icon.dataset.classesId) : undefined;
 
+            // console.log(`courseId:`)
+            // console.warn(courseId)
+
             const likeCountEl = icon.closest(".like-counter")?.querySelector(".like-count");
             const dislikeCountEl = icon.closest(".dislike-counter")?.querySelector(".dislike-count");
 
@@ -182,7 +183,6 @@ async function refreshReactions() {
             if (likeCountEl) likeCountEl.textContent = likes;
             if (dislikeCountEl) dislikeCountEl.textContent = dislikes;
 
-
             let userReaction;
 
             if (icon.classList.contains("btn-like")) {
@@ -190,6 +190,9 @@ async function refreshReactions() {
                 if(userReaction){
                     icon.classList.remove("far"); // oco
                     icon.classList.add("fas");    // cheio
+                } else{
+                    icon.classList.remove("fas"); // oco
+                    icon.classList.add("far");    // cheio
                 }
             }
 
@@ -198,6 +201,9 @@ async function refreshReactions() {
                 if(userReaction){
                     icon.classList.remove("far");
                     icon.classList.add("fas");
+                }  else{
+                    icon.classList.remove("fas"); // oco
+                    icon.classList.add("far");    // cheio
                 }
             }
 

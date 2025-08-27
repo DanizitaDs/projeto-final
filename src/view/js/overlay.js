@@ -172,7 +172,7 @@ document.getElementById("form-search").addEventListener("submit", async (e) => {
         .map(
           (curso) => `
         <div class="card mb-3 position-relative" style="max-width: 540px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          <button class="btn-close position-absolute end-0 top-0 m-2" onclick="fecharResultado(this)"></button>
+          <button class="btn-close position-absolute end-0 top-0 m-2"></button>
           <div class="row g-0 align-items-center">
             <div class="col-auto">
               <img src="${curso.imageUrl}" alt="Imagem do curso" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px 0 0 8px;">
@@ -192,6 +192,13 @@ document.getElementById("form-search").addEventListener("submit", async (e) => {
     }
 
     if (overlayBusca) overlayBusca.classList.add("show");
+
+    Array.from(document.getElementsByClassName("btn-close")).forEach( btn => {
+      btn.addEventListener("click", () => {
+        fecharResultado(btn)
+      })
+    })
+
   } catch (err) {
     console.error("Erro ao buscar cursos:", err);
     showAlert("Erro ao buscar cursos. Tente novamente mais tarde.", "danger");

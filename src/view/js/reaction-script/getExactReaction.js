@@ -5,7 +5,7 @@ export default async function getExactReaction(userId, courseId, classesId, reac
             headers:{
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({userId, courseId, classesId, reaction })
+            body: JSON.stringify({userId, courseId, classesId, reaction})
         });
 
         if(res.ok){

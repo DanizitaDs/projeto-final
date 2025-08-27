@@ -31,13 +31,13 @@ export class ReactionController {
   }
 
   async findExact(request: Request, response: Response): Promise<Response> {
-    let { userId, courseId, classesId} = request.body;
+    let { userId, courseId, classesId, reaction} = request.body;
 
     const data: IRequestReaction = { 
         userId: userId? userId : undefined, 
         courseId: courseId? courseId : undefined, 
         classesId: classesId? classesId : undefined,
-        reaction: "like"
+        reaction
     };
 
     const reactionFinded = await this.reactionService.getExactReaction(data);

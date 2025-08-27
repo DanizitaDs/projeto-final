@@ -1,0 +1,32 @@
+
+.user {
+    padding: 5px 10px;
+    margin-left: 10px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    border: 0.5px solid black;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    border: 0.5px solid black;
+}
+
+.btn-cursos{
+    background-color: white;
+    color: #333;
+    padding: 5px 10px;
+    border: 0.5px solid black;
+    cursor: pointer;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    padding: 5px 10px;
+    border: none;
+    color: #333;
+    text-decoration: none;
+    background-color: transparent;
+    margin-left: 10px;
+    transition: all 0.3s ease;
+    
+}

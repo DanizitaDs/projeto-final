@@ -1,0 +1,11 @@
+.btn-cursos{
+    background-color: #ffffff;
+        color: #333;
+        padding: 5px 10px;
+        border: 0.5px solid black;
+        cursor: pointer;
+        border-radius: 5px;
+        text-decoration: none;
+        display: inline-block;
+        font-weight: bold;
+}
