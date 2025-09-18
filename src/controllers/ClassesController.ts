@@ -14,7 +14,7 @@ export class ClassesController {
     const classEntity = await this.classesService.createClass(classData);
     return response.status(201).json({
       id: classEntity.id,
-      title: classEntity.title,
+      title: classEntity.title,                             
       description: classEntity.description,
       url: classEntity.url,
       //   course: {

@@ -647,7 +647,7 @@ h4 {
   backdrop-filter: blur(10px);
   border-radius: 20px;
   margin-top: 30%;
-  margin-bottom: 30%;
+  margin-bottom: 38%;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -1029,10 +1029,16 @@ h4 {
   display: none !important;
 }
 
+.owl-item .item img {
+  height: 500px;       /* aqui controla só o carrossel */
+  object-fit: cover;   /* mantém o corte proporcional */
+}
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .profile-card {
-    padding: 20px;
+    padding: 30px;
   }
 
   .profile-name {

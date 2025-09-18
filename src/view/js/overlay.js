@@ -181,7 +181,7 @@ document.getElementById("form-search").addEventListener("submit", async (e) => {
               <div class="card-body">
                 <h5 class="card-title mb-1">${curso.title}</h5>
                 <p class="card-text small text-muted">${curso.description}</p>
-                <a href="CriarCurso.html?id=${curso.id}" class="btn btn-outline-primary btn-sm mb-2">Ver Curso</a>
+                <a href="detalhes_curso.html?id=${curso.id}" class="btn btn-outline-primary btn-sm mb-2">Ver Curso</a>
               </div>
             </div>
           </div>
